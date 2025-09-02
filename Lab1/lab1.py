@@ -13,7 +13,7 @@ sigmaB = 1 #how data are sparsed around the mean
 
 np.random.seed(42) # to have same values over different iterations
 
-#Return n samples in the form (x,y) from the “standard normal” distribution.
+#Return n samples in the form (x,y) from the “standard normal” distribution ( gaussian distribution with mean=0 and deviation=1).
 classA = np.random.randn(2, n) * sigmaA + mA.reshape(2,1)
 classB = np.random.randn(2, n) * sigmaB + mB.reshape(2,1)
 
@@ -36,7 +36,7 @@ plt.title('Linearly-Separable Data for Binary Classification')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.axis('equal')
-plt.show()
+#plt.show()
 
 
 ##### Applying Learning Rules
@@ -47,6 +47,6 @@ np.random.seed(42) # to have same values over different iterations
 # Before the learning phase can be executed, the weights must be initialised (have initial values assigned).
 # The normal procedure is to start with small random numbers drawn from the normal distribution with zero mean
 sigmaN = 0.5 
-mN = np.array([0,0]) 
-W = np.random.randn(1,n) * sigmaN + mN
+W = np.random.randn(1,2) * sigmaN
 print(W)
+

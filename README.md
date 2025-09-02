@@ -8,5 +8,5 @@ X -> Data Matrix
 - One column for each value
 
 W -> Weight Matrix
-- One row for each output
-- One column for each input
+- One row for each feature of the output data
+- One column for each feature of the input data

@@ -15,11 +15,15 @@ np.random.seed(42) # to have same values over different iterations
 
 #Return n samples in the form (x,y) from the “standard normal” distribution ( gaussian distribution with mean=0 and deviation=1).
 classA = np.random.randn(2, n) * sigmaA + mA.reshape(2,1)
+
+np.random.seed(42) # to have same values over different iterations
 classB = np.random.randn(2, n) * sigmaB + mB.reshape(2,1)
 
 # data creation
 X = np.hstack([classA, classB])
 labels = np.hstack([np.ones(n),-np.ones(n)])
+
+np.random.seed(42) # to have same values over different iterations
 
 # Shuffling dei dati (equivalente a randperm in MATLAB)
 indices = np.random.permutation(2*n)

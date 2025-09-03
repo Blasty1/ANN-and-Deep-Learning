@@ -36,7 +36,7 @@ plt.title('Linearly-Separable Data for Binary Classification')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.axis('equal')
-#plt.show()
+plt.show()
 
 
 ##### Applying Learning Rules
@@ -49,4 +49,3 @@ np.random.seed(42) # to have same values over different iterations
 sigmaN = 0.5 
 W = np.random.randn(1,2) * sigmaN
 print(W)
-

@@ -45,7 +45,7 @@ plt.axis('equal')
 plt.show()
 
 
-##### Applying Learning Rules
+##### Applying all the 4 Learning Rules
 
 np.random.seed(45) # to have same values over different iterations
 
@@ -55,7 +55,21 @@ np.random.seed(45) # to have same values over different iterations
 sigmaN = 0.5 
 W = np.random.randn(1,2) * sigmaN
 bias = np.random.randn() * sigmaN
-classicalLearningRuleBatch(X,labels,W,bias,500)
+eta=0.01
+classicalLearningRuleBatch(X,labels,W,bias,500,eta)
+
+np.random.seed(45) # to have same values over different iterations
+
+# W dimensions 
+# Before the learning phase can be executed, the weights must be initialised (have initial values assigned).
+# The normal procedure is to start with small random numbers drawn from the normal distribution with zero mean
+sigmaN = 0.5 
+W = np.random.randn(1,2) * sigmaN*500
+bias = np.random.randn() * sigmaN
+eta=0.01
+classicalLearningRuleOnline(X,labels,W,bias,500,eta)
+    
+
 
 np.random.seed(45) # to have same values over different iterations
 
@@ -64,4 +78,16 @@ W = np.random.randn(1,2) * sigmaN
 bias = np.random.randn() * sigmaN
 labels = np.hstack([np.ones(n),-np.ones(n)])  # 1 for classA and -1 for classB
 labels = labels[indices]
-deltaRuleBatch(X,labels,W,bias,20)
+eta=0.01
+deltaRuleBatch(X,labels,W,bias,20,eta)
+
+
+np.random.seed(45) # to have same values over different iterations
+
+sigmaN = 0.5 
+W = np.random.randn(1,2) * sigmaN
+bias = np.random.randn() * sigmaN
+labels = np.hstack([np.ones(n),-np.ones(n)])  # 1 for classA and -1 for classB
+labels = labels[indices]
+eta=0.01
+deltaRuleOnline(X,labels,W,bias,20,eta)

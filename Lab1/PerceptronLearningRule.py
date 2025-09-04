@@ -48,7 +48,7 @@ def print_decision_boundary(X,targets,weights,bias,epoch_number,name):
 
 def classicalLearningRuleBatch(X, targets,weights,bias,max_epochs,eta):
     mse_hist = []
-    print_decision_boundary(X,targets,weights,bias,0,"Classical Learning Rule Batch")
+    # print_decision_boundary(X,targets,weights,bias,0,"Classical Learning Rule Batch")
 
     #iterate through the wholde dataset
     for epoch in range(max_epochs):
@@ -82,7 +82,7 @@ def classicalLearningRuleBatch(X, targets,weights,bias,max_epochs,eta):
         if changed == 0:
             break
     
-        print_decision_boundary(X,targets,weights,bias,epoch, "Classical Learning Rule Batch")
+        #print_decision_boundary(X,targets,weights,bias,epoch, "Classical Learning Rule Batch")
 
     return mse_hist
 
@@ -90,7 +90,7 @@ def classicalLearningRuleBatch(X, targets,weights,bias,max_epochs,eta):
 
 def classicalLearningRuleOnline(X, targets,weights,bias,max_epochs,eta):
     mse_hist = []
-    print_decision_boundary(X,targets,weights,bias,0,"Classical Learning Rule Online")
+    # print_decision_boundary(X,targets,weights,bias,0,"Classical Learning Rule Online")
 
     #iterate through the wholde dataset
     for epoch in range(max_epochs):
@@ -106,7 +106,7 @@ def classicalLearningRuleOnline(X, targets,weights,bias,max_epochs,eta):
             y_afterthreshold = active_function(y_prethreshold)
 
             error = target_i - y_afterthreshold 
-            sqerr = error**2
+            sqerr += error**2
             updated_weights=eta*error*x_i.reshape(1,2)
             
             #we want to check if all the elements of the weights has not changed
@@ -115,9 +115,20 @@ def classicalLearningRuleOnline(X, targets,weights,bias,max_epochs,eta):
                 bias = bias + eta*error
                 changed=1
         mse_hist.append(sqerr / X.shape[1])
-        print_decision_boundary(X,targets,weights,bias,epoch+1,"Classical Learning Rule Online")        
+        # print_decision_boundary(X,targets,weights,bias,epoch+1,"Classical Learning Rule Online")        
         # nothing has changed from the last epoch, the convergence has been reached
         if changed == 0:
             break
     return mse_hist
+
+def draw_mse_cl(epochs, eta, mse):
+    plt.figure()
+    nepochs = np.arange(1, epochs + 1)
+    plt.plot(nepochs, np.array(mse), label=f"η={eta}")
+    plt.xlabel("Epochs")
+    plt.ylabel("Mean Squared Error (MSE)")
+    plt.title("Classical Rule (Online) – MSE vs Epochs")
+    plt.legend()
+    plt.grid(True, linestyle=":")
+    plt.show()
 

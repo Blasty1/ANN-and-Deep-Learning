@@ -78,8 +78,8 @@ W = np.random.randn(1,2) * sigmaN
 bias = np.random.randn() * sigmaN
 labels = np.hstack([np.ones(n),-np.ones(n)])  # 1 for classA and -1 for classB
 labels = labels[indices]
-eta=0.01
-deltaRuleBatch(X,labels,W,bias,20,eta)
+# eta=0.01
+#deltaRuleBatch(X,labels,W,bias,20,eta)
 
 
 np.random.seed(45) # to have same values over different iterations
@@ -89,5 +89,68 @@ W = np.random.randn(1,2) * sigmaN
 bias = np.random.randn() * sigmaN
 labels = np.hstack([np.ones(n),-np.ones(n)])  # 1 for classA and -1 for classB
 labels = labels[indices]
-eta=0.01
-deltaRuleOnline(X,labels,W,bias,20,eta)
+# eta=0.0001
+#deltaRuleOnline(X,labels,W,bias,20,eta)
+
+
+#Adjust the learning rate and study the convergence of the Delta rule learning  and classical learning in online mode
+eta=0.0001
+epochs = 20
+mseDl = deltaRuleOnline(X,labels,W,bias,epochs, eta)
+mseCl = classicalLearningRuleOnline(X, labels,W, bias, epochs, eta)
+draw_mse_dl(epochs,eta, mseDl)
+draw_mse_cl(epochs, eta, mseCl)
+
+# COMPARING DL BATCH MODE AND ONLINE MODE WITH TWO VALUES OF INIT WEIGHTS
+# Multiply initial weights by O.01 to have a small initial values
+W_low = W*0.01
+bias_low = bias*0.01
+
+dl_mse_batch_low = deltaRuleBatch(X, labels, W_low,bias_low, epochs, eta)
+dl_mse_onl_low = deltaRuleOnline(X, labels, W_low,bias_low, epochs, eta)
+
+# Plot with low initial values
+plt.figure()
+nepochs = np.arange(1, epochs + 1)
+plt.plot(nepochs, dl_mse_onl_low,   label=f"Online (η={eta})")
+plt.plot(nepochs, dl_mse_batch_low, label=f"Batch (η={eta})", linestyle="--")
+plt.xlabel("Epochs")
+plt.ylabel("Mean Squared Error (MSE)")
+plt.title("Delta Rule: Batch vs Online (Fixed η and low init weights)")
+plt.legend()
+plt.grid(True, linestyle=":")
+plt.show()
+
+#Plot with normal init values
+dl_mse_batch = deltaRuleBatch(X, labels, W, bias, epochs, eta)
+dl_mse_onl= deltaRuleOnline(X, labels, W, bias, epochs, eta)
+plt.figure()
+nepochs = np.arange(1, epochs + 1)
+plt.plot(nepochs, dl_mse_onl,   label=f"Sequential (η={eta})")
+plt.plot(nepochs, dl_mse_batch, label=f"Batch (η={eta})", linestyle="--")
+plt.xlabel("Epochs")
+plt.ylabel("Mean Squared Error (MSE)")
+plt.title("Delta Rule: Batch vs Online (Fixed η and normal init weights)")
+plt.legend()
+plt.grid(True, linestyle=":")
+plt.show()
+
+#Plot the convergence of DL batch mode without bias
+bias = 0.0
+
+mse = deltaRuleBatch(X, labels,W, bias, epochs, eta )
+
+nepochs = np.arange(1, epochs + 1)
+plt.figure()
+plt.plot(nepochs, mse, label=f"Batch (η={eta})")
+plt.xlabel("Epochs")
+plt.ylabel("Mean Squared Error (MSE)")
+plt.title(f"Delta Rule: Batch mode without bias and data on different quadrants")
+plt.legend()
+plt.grid(True, linestyle=":")
+plt.show()
+
+
+
+
+

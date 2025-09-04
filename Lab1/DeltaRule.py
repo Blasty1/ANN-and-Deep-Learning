@@ -45,8 +45,8 @@ def print_decision_boundary(X,targets,weights,bias,epoch_number,name):
     
 def deltaRuleBatch(X, targets,weights,bias,max_epochs,eta):
     mse_hist = []
-    eta = 0.05 #hyperparameter
-    print_decision_boundary(X,targets,weights,bias,0,"Delta Rule Batch")
+    #eta = 0.05 #hyperparameter
+    # print_decision_boundary(X,targets,weights,bias,0,"Delta Rule Batch")
 
     #iterate through the wholde dataset
     for epoch in range(max_epochs):
@@ -74,13 +74,13 @@ def deltaRuleBatch(X, targets,weights,bias,max_epochs,eta):
         weights = weights + weightsAccum
         bias = bias + biasAccum
     
-        print_decision_boundary(X,targets,weights,bias,epoch+1,"Delta Rule Batch")
+        # print_decision_boundary(X,targets,weights,bias,epoch+1,"Delta Rule Batch")
     return mse_hist
 
 def deltaRuleOnline(X, targets,weights,bias,max_epochs,eta):
-    eta = 0.05 #hyperparameter
+    #eta = 0.05 #hyperparameter
     mse_hist = []
-    print_decision_boundary(X,targets,weights,bias,0,"Delta Rule Online")
+    # print_decision_boundary(X,targets,weights,bias,0,"Delta Rule Online")
     
     #iterate through the wholde dataset
     for epoch in range(max_epochs):
@@ -101,5 +101,19 @@ def deltaRuleOnline(X, targets,weights,bias,max_epochs,eta):
             bias = bias + eta*error
 
         mse_hist.append(sqerr/X.shape[1])
-        print_decision_boundary(X,targets,weights,bias,epoch+1, "Delta Rule Online")
+        # print_decision_boundary(X,targets,weights,bias,epoch+1, "Delta Rule Online")
     return mse_hist
+
+
+# Draw MSE curve
+
+def draw_mse_dl(epochs, eta, mse):
+    plt.figure()
+    nepochs = np.arange(1, epochs + 1)    
+    plt.plot(nepochs, np.array(mse), label=f"η={eta}")
+    plt.xlabel("Epochs")
+    plt.ylabel("Mean Squared Error (MSE)")
+    plt.title("Delta Rule (Online) – MSE vs Epochs")
+    plt.legend()
+    plt.grid(True, linestyle=":")
+    plt.show()

@@ -29,17 +29,17 @@ def perceptron_learning_rule_online(X, targets, weights, eta=0.01, max_epochs=50
             update = eta * error
             weights[1:] += update * x
             weights[0] += update
-            weights_results.append(weights.copy)
-            error_sum += error
+            weights_results.append(weights.copy())
+            error_sum += error**2
         epoch_results = {
             'weights': weights_results.copy(),
-            'error': error_sum,
+            'error': error_sum / X.shape[1],
             'accuracy': correct_predictions / X.shape[1]
         }
         print(f'Error: {error_sum}, Accuracy: {epoch_results['accuracy']}')
         traning_data.append(epoch_results)
-        if error_sum == 0:
-            break
+        # if error_sum == 0:
+        #     break
     return traning_data
 
 
@@ -49,7 +49,7 @@ def delta_activation_function(weights, X):
     return weight_sum(weights, X)
 
 def delta_predict(weights, x):
-    return 1 if weight_sum(weights, x) > 0.0 else 0
+    return 1 if weight_sum(weights, x) > 0.0 else -1
 
 def delta_rule_online(X, targets, weights, eta=0.01, max_epochs=50):
     traning_data = []
@@ -65,18 +65,18 @@ def delta_rule_online(X, targets, weights, eta=0.01, max_epochs=50):
             if delta_predict(weights, x) == t:
                 correct_predictions +=1
             error = t - y_pred
-            serror = error**2
-            delta_w = eta * serror
+            serror = error*error
+            delta_w = eta * error
             weights[1:] += delta_w * x
             weights[0] += delta_w
             weights_results.append(weights.copy())
-            error_sum += error
+            error_sum += serror
         epoch_results = {
             'weights': weights_results.copy(),
             'error': error_sum/X.shape[1],
             'accuracy': correct_predictions / X.shape[1]
         }
-        print(f'Error: {error_sum}, Accuracy: {epoch_results['accuracy']}')
+        print(f'MSE: {serror}, Error: {error_sum}, Accuracy: {epoch_results['accuracy']}')
 
         traning_data.append(epoch_results)
     return traning_data
@@ -128,38 +128,85 @@ def delta_rule_batch(X, targets, weights, eta=0.01, max_epochs=50, batch_size = 
         traning_data.append(epoch_results)
     return traning_data
 
+def run_delta_buch_for_split_dataset(n, eta, num_epoch, percentA, percentB, task_d = False):
+    classA, classB = gnd.generate_splited_data(n, percentA, percentB, task_d)
+    X, targets = gnd.suffle_and_create_labels(classA, classB)
+    np.random.seed(52)
+    weights = np.random.randn(3) *0.2 
+
+    traning_data = delta_rule_batch(X.T, targets, weights, eta=eta, max_epochs=num_epoch)
+    errors = [epoch['error'] for epoch in traning_data]    
+    accuracies = [epoch['accuracy'] for epoch in traning_data]    
+    weights = [epoch['weights'][-1] for epoch in traning_data]
+    if task_d:
+        create_animation(X.T, weights, targets, f'delta_rule_batch_taskD', f'Delta rule batch for delete 20%A1 and 80%A2 data')
+    else:  
+        create_animation(X.T, weights, targets, f'delta_rule_batch_{int(percentA*100)}_{int(percentB*100)}', f'Delta rule batch for delete {int(percentA*100)}%A and {int(percentB*100)}%B data')
+    return errors, accuracies, weights
 
 if __name__ == "__main__":
     n = 100
+    eta = 0.01
     num_epochs = 150
-    classA, classB = gnd.generate_overlaping_data(n)
-    #classA, classB = gnd.generate_splited_data(n, 0.0, 0.0, True)
-    X, targets = gnd.suffle_and_create_labels(classA, classB)
+    errors = []
+    accuracies = []
+    weights_vec = []
 
-    bias = [1] * X.shape[1]
-    np.random.seed(42)
-    weights = np.random.randn(3) *0.5 # [bias, x1, x2]
+    deleteA = [0.0, 0.25, 0.5, 0.0]
+    deleteB = [0.0, 0.25, 0.0, 0.5]
+    for A, B in zip(deleteA, deleteB):
+        err, acc, w =  run_delta_buch_for_split_dataset(n, eta, num_epochs, A, B)
+        errors.append(err)
+        accuracies.append(acc)
+        weights_vec.append(w)
+    err, acc, w =  run_delta_buch_for_split_dataset(n, eta, num_epochs, 0.0, 0.0, True)
+    errors.append(err)
+    accuracies.append(acc)
+    weights_vec.append(w)
+    labels_vec = ['All data', 'Without 25% each class', 'Without 50% A', 'Without 50% B', 'Without 20% A1 & 80% A2']
+    compere_accuracy(accuracies, labels_vec, 'accuracy_delete_samples_comper')
+    compere_convergence(errors, labels_vec, 'error_delete_samples_comper')
+    # classA, classB = gnd.generate_overlaping_data(n)
+    # #classA, classB = gnd.generate_splited_data(n, 0.0, 0.0, True)
+    # X, targets = gnd.suffle_and_create_labels(classA, classB)
 
-    # pl_traning_data = perceptron_learning_rule_online(X, targets, weights, eta=0.01, max_epochs=num_epochs)
+    # bias = [1] * X.shape[1]
+    # np.random.seed(42)
+    # weights = np.random.randn(3) *0.5 # [bias, x1, x2]
+
+    # pl_traning_data = perceptron_learning_rule_online(X, targets, weights, eta=eta, max_epochs=num_epochs)
     # pl_errors = [epoch['error'] for epoch in pl_traning_data]    
     # pl_accuracies = [epoch['accuracy'] for epoch in pl_traning_data]    
-    # plot_convergence(pl_errors, num_epochs)
-    # plot_accuracy(pl_accuracies, num_epochs)
+    # # plot_convergence(pl_errors, 'erros_perceptron_rule_overlaping')
+    # plot_accuracy(pl_accuracies, 'accuracy_perceptron_rule_overlaping')
+    # pl_weights = [epoch['weights'][-1] for epoch in pl_traning_data]
+    # create_animation(X.T, pl_weights, targets, 'Perceptron_rule_overlaping', 'Perceptron leraning rule for overlaping data')
 
-    # dr_traning_data = delta_rule_online(X, targets, weights, eta=0.01, max_epochs=num_epochs)
+    
+    # dr_traning_data = delta_rule_online(X, targets, weights, eta=eta, max_epochs=num_epochs)
     # dr_errors = [epoch['error'] for epoch in dr_traning_data]    
     # dr_accuracies = [epoch['accuracy'] for epoch in dr_traning_data]    
-    # plot_convergence(dr_errors, num_epochs)
-    # plot_accuracy(dr_accuracies, num_epochs)
+    # # plot_convergence(dr_errors, 'error_delta_rule_online_overlaping')
+    # plot_accuracy(dr_accuracies, 'accuracy_delta_rule_online_overlaping')
+    # dr_weights = [epoch['weights'][-1] for epoch in dr_traning_data]
+    # create_animation(X.T, dr_weights, targets, 'Delta_rule_online_overlaping', 'Delta rule online for overlaping data')
 
-    drb_traning_data = delta_rule_batch(X.T, targets, weights, eta=0.005, max_epochs=num_epochs)
-    drb_errors = [epoch['error'] for epoch in drb_traning_data]    
-    drb_accuracies = [epoch['accuracy'] for epoch in drb_traning_data]    
-    # plot_convergence(drb_errors, num_epochs)
-    # plot_accuracy(drb_accuracies, num_epochs)
-    drb_weights = [epoch['weights'][-1] for epoch in drb_traning_data]# for weight in epoch['weights'][-1]]
-    print(drb_weights)
-    
-    create_animation(X.T, drb_weights, targets, 'delta_rule_batch_overlaping', 'Delta rule batch leraning for overlaping data')
+    # classA, classB = gnd.generate_splited_data(n, 0.0, 0.0, True)
+    # X, targets = gnd.suffle_and_create_labels(classA, classB)
+    # bias = [1] * X.shape[1]
+    # np.random.seed(42)
+    # weights = np.random.randn(3) *0.5 # [bias, x1, x2]
 
+
+    # drb_traning_data = delta_rule_batch(X.T, targets, weights, eta=0.005, max_epochs=num_epochs)
+    # drb_errors = [epoch['error'] for epoch in drb_traning_data]    
+    # drb_accuracies = [epoch['accuracy'] for epoch in drb_traning_data]    
+    # # plot_convergence(drb_errors, 'error_delta_rule_batch_overlaping')
+    # # plot_accuracy(drb_accuracies, 'accuracy_delta_rule_batch_overlaping')
+    # drb_weights = [epoch['weights'][-1] for epoch in drb_traning_data]# for weight in epoch['weights'][-1]]
+   
+    # create_animation(X.T, drb_weights, targets, 'delta_rule_batch_overlaping', 'Delta rule batch leraning for overlaping data')
+
+    # compere_convergence(pl_errors, drb_errors, dr_errors, 'error_compere_overlaping')
     
+    # compere_accuracy(pl_accuracies, drb_accuracies, dr_accuracies, 'accuracy_compere_overlaping')

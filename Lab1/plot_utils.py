@@ -3,13 +3,14 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import os
 
-def plot_convergence(error):
+def plot_convergence(error, filename):
     """
     Ploting error convergence.
     
     Inputs:
     error : array - contains mean squere error from each epoch
-    
+    filename : string - name to save a fig in file
+
     """
 
     fig = plt.figure()
@@ -20,15 +21,42 @@ def plot_convergence(error):
     plt.xlabel('Epoch')
     plt.ylabel('Error')
     plt.grid(True)
+    os.makedirs('Lab1\\3_1_3_plots\\', exist_ok=True)
+    plt.savefig(f'Lab1\\3_1_3_plots\\{filename}.png')
     plt.show()
 
-def plot_accuracy(accuracy):
+def compere_convergence(errors, labels, filename):
+    """
+    Ploting error convergence.
+    
+    Inputs:
+    error : array - contains mean squere error from each epoch
+    filename : string - name to save a fig in file
+
+    """
+
+    fig = plt.figure()
+    ax = plt.axes()
+    x_values = range(len(errors[0]))
+    for err, label in zip(errors, labels):
+        ax.plot(x_values, err, linestyle='-', label = label)
+    plt.title('Error convergence')
+    plt.xlabel('Epoch')
+    plt.ylabel('Error')
+    plt.legend()
+    plt.grid(True)
+    os.makedirs('Lab1\\3_1_3_plots\\', exist_ok=True)
+    plt.savefig(f'Lab1\\3_1_3_plots\\{filename}.png')
+    plt.show()
+
+def plot_accuracy(accuracy, filename):
     """
     Ploting error convergence.
     
     Inputs:
     accuaracy : array - contains accuracy value form each epoch
-    
+    filename : string - name to save a fig in file
+
     """
     fig = plt.figure()
     ax = plt.axes()
@@ -36,7 +64,32 @@ def plot_accuracy(accuracy):
     ax.plot(x, accuracy, linestyle='-')
     plt.title('Accuracy for epoch')
     plt.grid(True)
+    os.makedirs('Lab1\\3_1_3_plots\\', exist_ok=True)
+    plt.savefig(f'Lab1\\3_1_3_plots\\{filename}.png')
     plt.show()
+
+
+def compere_accuracy(accuracies, labels, filename):
+    """
+    Ploting error convergence.
+    
+    Inputs:
+    accuaracy : array - contains accuracy value form each epoch
+    filename : string - name to save a fig in file
+
+    """
+    fig = plt.figure()
+    ax = plt.axes()
+    x_values = range(len(accuracies[0]))
+    for acc, label in zip(accuracies, labels):
+        ax.plot(x_values, acc, linestyle='-', label = label)
+    plt.title('Accuracy for epoch')
+    plt.legend()
+    plt.grid(True)
+    os.makedirs('Lab1\\3_1_3_plots\\', exist_ok=True)
+    plt.savefig(f'Lab1\\3_1_3_plots\\{filename}.png')
+    plt.show()
+
 
 def animate(i, X, all_weights, targets, line):
     """
@@ -55,7 +108,6 @@ def animate(i, X, all_weights, targets, line):
 
     weights = all_weights[i]
     
-    # Przeliczanie pozycji granicy decyzyjnej
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     x_values = np.linspace(x_min, x_max, 100)
     
@@ -65,11 +117,9 @@ def animate(i, X, all_weights, targets, line):
         y_values = np.linspace(X[:, 1].min() - 1, X[:, 1].max() + 1, 100)
         x_values = np.full_like(y_values, -weights[0] / weights[1])
     else:
-        # Obsługa przypadku, gdy wagi są zerowe
         y_values = []
         x_values = []
 
-    # Aktualizacja danych linii
     line.set_data(x_values, y_values)
     return line,
 
@@ -88,15 +138,12 @@ def create_animation(X, all_weights, targets, filename, title):
 
     fig, ax = plt.subplots(figsize=(8,8))
     
-    # Rysowanie punktów
+
     colors = np.where(targets == 1, 'blue', 'red')
-    print(colors)
     ax.scatter(X[:, 0], X[:, 1], c=colors, alpha=0.7, s=50)
 
-    # Inicjalizacja linii granicy decyzyjnej
     line, = ax.plot([], [], color='b', linestyle='-')
-    
-    # Ustawianie granic wykresu
+
     ax.set_xlim(X[:, 0].min() - 1, X[:, 0].max() + 1)
     ax.set_ylim(X[:, 1].min() - 1, X[:, 1].max() + 1)
     plt.title('Decision boundary for batch delta rule')

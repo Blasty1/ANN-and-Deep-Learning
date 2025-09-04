@@ -113,24 +113,48 @@ def plot_data(classA, classB, type = 'Overlaping'):
     plt.grid(True, alpha=0.3)
     plt.axis('equal')
     plt.show()
+
+def suffle_and_create_labels(classA, classB):
+    """
+    Create labels for the two classes. Suffle the points and the labels.
+
+    Inputs:
+    classA : np.array - points of class A
+    classB : np.array - points of class B
+
+    Outputs:
+    dataset : np.array - suffled points of both classes
+    labels : np.array - suffled labels for the points
+    """
+    nA = classA.shape[1]
+    nB = classB.shape[1]
+    labelsA = np.ones(nA)
+    labelsB = -np.ones(nB)
+    labels = np.hstack((labelsA, labelsB))
+    dataset = np.hstack((classA, classB))
+    np.random.seed(42)
+    indices = np.random.permutation(nA + nB)
+    dataset = dataset[:, indices]
+    labels = labels[indices]
+    return dataset, labels
     
 #! Example of usage
-# if __name__ == "__main__":
-#     n = 100
-#     classA, classB = generate_overlaping_data(n)
-#     plot_data(classA, classB, type='Overlaping')
+if __name__ == "__main__":
+    n = 100
+    classA, classB = generate_overlaping_data(n)
+    plot_data(classA, classB, type='Overlaping')
 
-#     classA, classB = generate_splited_data(n, 0.0, 0.0)
-#     plot_data(classA, classB, type='Splited ALL')
+    classA, classB = generate_splited_data(n, 0.0, 0.0)
+    plot_data(classA, classB, type='Splited ALL')
 
-#     classA, classB = generate_splited_data(n, 0.25, 0.25)
-#     plot_data(classA, classB, type='Splited 75%A 75%B')
+    classA, classB = generate_splited_data(n, 0.25, 0.25)
+    plot_data(classA, classB, type='Splited 75%A 75%B')
 
-#     classA, classB = generate_splited_data(n, 0.5, 0.0)
-#     plot_data(classA, classB, type='Splited 50%A')
+    classA, classB = generate_splited_data(n, 0.5, 0.0)
+    plot_data(classA, classB, type='Splited 50%A')
 
-#     classA, classB = generate_splited_data(n, 0.0, 0.5)
-#     plot_data(classA, classB, type='Splited 50%B')
+    classA, classB = generate_splited_data(n, 0.0, 0.5)
+    plot_data(classA, classB, type='Splited 50%B')
 
-#     classA, classB = generate_splited_data(n, 0.0, 0.0, task_d=True)
-#     plot_data(classA, classB, type='Splited Task d')
+    classA, classB = generate_splited_data(n, 0.0, 0.0, task_d=True)
+    plot_data(classA, classB, type='Splited Task d')

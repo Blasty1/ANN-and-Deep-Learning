@@ -1,3 +1,5 @@
+from PerceptronLearningRule import *
+from DeltaRule import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -21,7 +23,7 @@ classB = np.random.randn(2, n) * sigmaB + mB.reshape(2,1)
 
 # data creation
 X = np.hstack([classA, classB])
-labels = np.hstack([np.ones(n),-np.ones(n)])
+labels = np.hstack([np.ones(n),np.zeros(n)])  # 1 for classA and 0 for classB
 
 np.random.seed(42) # to have same values over different iterations
 
@@ -33,7 +35,7 @@ labels = labels[indices]
 # Data Visualization
 plt.figure(figsize=(10, 8))
 plt.scatter(X[0, labels == 1], X[1, labels == 1], c='red', alpha=0.7, label='Classe A', s=50)
-plt.scatter(X[0, labels == -1], X[1, labels == -1], c='blue', alpha=0.7, label='Classe B', s=50)
+plt.scatter(X[0, labels == 0], X[1, labels == 0], c='blue', alpha=0.7, label='Classe B', s=50)
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
 plt.title('Linearly-Separable Data for Binary Classification')
@@ -45,11 +47,21 @@ plt.show()
 
 ##### Applying Learning Rules
 
-np.random.seed(42) # to have same values over different iterations
+np.random.seed(45) # to have same values over different iterations
 
 # W dimensions 
 # Before the learning phase can be executed, the weights must be initialised (have initial values assigned).
 # The normal procedure is to start with small random numbers drawn from the normal distribution with zero mean
 sigmaN = 0.5 
 W = np.random.randn(1,2) * sigmaN
-print(W)
+bias = np.random.randn() * sigmaN
+classicalLearningRuleBatch(X,labels,W,bias,500)
+
+np.random.seed(45) # to have same values over different iterations
+
+sigmaN = 0.5 
+W = np.random.randn(1,2) * sigmaN
+bias = np.random.randn() * sigmaN
+labels = np.hstack([np.ones(n),-np.ones(n)])  # 1 for classA and -1 for classB
+labels = labels[indices]
+deltaRuleBatch(X,labels,W,bias,20)

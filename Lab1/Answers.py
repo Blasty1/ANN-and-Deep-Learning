@@ -3,13 +3,11 @@
 """
 1. Perceptron vs Delta Learning Rule
 
-        Perceptron Learning Rule: The error quickly stabilizes around 0.5, showing that the perceptron rule does not effectively 
-        minimize the mean squared error. This happens because it only corrects classification mistakes in a binary way,
-        without considering how far data points are from the decision boundary.
-
-        Delta Learning Rule: The error decreases from 0.075 to about 0.05. Since the delta rule is based on gradient 
-        descent, it directly minimizes the squared error, which results in better convergence.
-
+       -Perceptron Learning Rule: The error stabilizes quickly  around 0, which confirms the Perceptron Convergence Theorem 
+	   that guarantees the model convergence if a solution exists after a finite number of steps, independent of the learning rate values.
+	
+	   -Delta Learning Rule: The error decreases from 0.075 to about 0.05. Since the delta rule is based on gradient descent, it is impossible 
+	   to reach a null value for error but still able to minimize the squared error, which results in good convergence.
 2. Delta Rule: Batch vs Online
     We compare batch and online learning under two different initial weight conditions:
 

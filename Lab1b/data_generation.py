@@ -1,0 +1,167 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+#* FOR LAB1b PART I
+def split_points(n = 100, class_array=None, percent=0.25):
+    """
+    Spliting datapoints for train and valid by a percentage of points from a class.
+
+    Inputs:
+    n : int - number of points in the class
+    class_array : np.array - points of the class
+    percent : float - percentage of points to delete
+
+    Outputs:
+    train_set : np.array - train points of the class after spliting
+    valid_set : np.array - valid points of the class after spliting
+    """
+    num_delete = int(percent * n)
+    np.random.seed(42)
+    # Determine number of points (columns for 2D, elements for 1D)
+    if class_array.ndim == 1:
+        total_points = class_array.shape[0]
+    else:
+        total_points = class_array.shape[1]
+    ids = np.random.choice(total_points, num_delete, replace=False)
+    mask = np.ones(total_points, dtype=bool)
+    mask[ids] = False
+    if class_array.ndim == 1:
+        train_set = class_array[mask]
+        valid_set = class_array[~mask]
+    else:
+        train_set = class_array[:, mask]
+        valid_set = class_array[:, ~mask]
+    return train_set, valid_set
+
+def generate_splited_data(n, percent_of_A = 0.25, percent_of_B = 0.25, task_d = False):
+    """
+    Generate two non-linear separable sets of points, class A and class B.
+    ClassA is splitet in two groups. Function enable to split points from both classes to train and valid .
+
+    Inputs:
+    n : int - number of points per class
+    percent_of_A : float - percentage of points to move from class A to valid set
+    percent_of_B : float - percentage of points to move from class B to valid set
+    task_d : bool - if True, move to valid set points from the two groups of class A 
+        ? task d definition form pdf file: 20% from a subset of classA for which 
+        ? classA(1,:)<0 and 80% from a subset of classA for which classA(1,:)>0
+
+    Outputs:
+    trainA : np.array - points of class A in train set
+    validA : np.array - points of class A in valid set
+    trainB : np.array - points of class B in train set
+    validB : np.array - points of class B in valid set
+
+    """
+    sigmaA = 0.2
+    mA = np.array([1.0, 0.3])
+    sigmaB = 0.3
+    mB = np.array([0.0, -0.1])
+
+    np.random.seed(32)
+    groupA1 = np.random.randn(1, round(0.5 * n)) * sigmaA - mA[0]
+    np.random.seed(42)
+    groupA2 = np.random.randn(1, round(0.5 * n)) * sigmaA + mA[0]
+    if task_d:
+        new_n = int(0.5 * n)
+        trainA1, validA1 = split_points(new_n, groupA1, 0.2)
+        trainA2, validA2 = split_points(new_n, groupA2, 0.8)
+        classA_x1 = np.concatenate((trainA1, trainA2), axis=1)
+        classA_x1_valid = np.concatenate((validA1, validA2), axis=1)
+    else:
+        classA_x1 = np.concatenate((groupA1, groupA2), axis=1)
+
+    
+
+    np.random.seed(42)
+    if task_d:        
+        classA_x2 = np.random.randn(1, n) * sigmaA + mA[1]
+        print(classA_x2)
+        classA_x2_train = classA_x2[0][: new_n]
+        classA_x2_valid = classA_x2[0][new_n :]
+        trainA = np.vstack((classA_x1, classA_x2_train))
+        percent_of_A = np.vstack((classA_x1_valid, classA_x2_valid))
+
+    else:
+        classA_x2 = np.random.randn(1, n) * sigmaA + mA[1]
+        classA = np.vstack((classA_x1, classA_x2))
+
+    np.random.seed(42)
+    classB = np.random.randn(2, n) * sigmaB
+    classB[0, :] += mB[0]
+    classB[1, :] += mB[1]
+
+    if percent_of_A > 0:
+        trainA, percent_of_A = split_points(n, classA, percent_of_A)
+    elif not task_d:
+        trainA = classA
+        percent_of_A = None
+    if percent_of_B > 0:
+        trainB, percent_of_B = split_points(n, classB, percent_of_B)
+    else:
+        trainB = classB
+        percent_of_B = None
+    
+    return trainA, percent_of_A, trainB, percent_of_B
+
+def plot_data(classA, classB, type = 'Splited data'):
+    plt.figure(figsize=(10, 8))
+    plt.scatter(classA[0, :], classA[1, :], c='red', alpha=0.7, label='Class A', s=50)
+    plt.scatter(classB[0, :], classB[1, :], c='blue', alpha=0.7, label='Class B', s=50)
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    plt.title(f'{type} Non Linearly-Separable Data for Binary Classification')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.axis('equal')
+    plt.show()
+
+
+#* FOR Lab1B PART II
+def generate_time_series_data(time_series, n = 1200, t_start = 301, t_stop = 1500):
+    # x_series = np.random.rand(1600)
+    # t = np.arange(300, 1500)
+    # input_data = np.array([x_series[t-20], x_series[t-15], x_series[t-10], x_series[t-5], x_series[t]])
+    # output_data = np.array(x_series[t+5])
+    # X = input_data.T
+    # y = output_data.T
+    # return np.array(X), np.array(y)
+    pass
+
+
+
+#! EXAMPLE OF USEGE
+# if __name__ == "__main__":
+    
+#     n = 100
+#     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
+#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
+#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
+#     plot_data(classA, classB, type='Splited ALL')
+
+#     trainA, validA, trainB, validB = generate_splited_data(n, 0.25, 0.25)
+#     # For show all points
+#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
+#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
+#     plot_data(classA, classB, type='Splited 75%A 75%B')
+#     # For show only train points
+#     plot_data(trainA, trainB, type='Splited 75%A 75%B')
+    
+
+#     trainA, validA, trainB, validB = generate_splited_data(n, 0.5, 0.0)
+    
+#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
+#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
+#     plot_data(classA, classB, type='Splited 50%A')
+
+#     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.5)
+    
+#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
+#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
+#     plot_data(classA, classB, type='Splited 50%B')
+
+#     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0, task_d=True)
+    
+#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
+#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
+#     plot_data(trainA, trainB, type='Splited Task d')

@@ -16,14 +16,14 @@ Rules:
 
 Tasks:
 - Part 3.1
-    - 3.1.1 Classification of linearly non-separable data
-        - Generate dataset
+    - 3.1.1 Classification of linearly non-separable data  #bruno
+        - Generate dataset 
         - Try different hidden nodes 
         - Sampling data to have a training dataset and a validation dataset
             -  Try different configurations and answer the 4 answers
             -  at least 3 cases for the number of hidden nodes
     - 3.1.2 Non-mandatory task ( skip for now )
-    - 3.1.3 Function Approximation
+    - 3.1.3 Function Approximation zuzanna and fatima
         - Generate the input and output datapoints for the function
         - Train the perceptron network 
             - Show the progress by visualising the output of the netwrok across the training patterns
@@ -33,11 +33,11 @@ Tasks:
             - Validate the performance by reporting the error on all the available data ( training and validation data ) and plot the resulting network's approximations in the 3D space
             - Report the error estimates of the 4 experiments
 - Part 4
-    - Generate Data
+    - Generate Data zuzanna
         - Pick 1200 points from t=301 to 1500
         - Divide the 1200 samples into 3 non overlapping blocks ( training, validation and testing )
         - Use the MSE as a measure of performance
-    - Network Configuration
+    - Network Configuration zuzanna and fatim
         - Build an MLP network with 5 inputs and one output
         - Set up the training process with a batch backprop algorithm and early stopping to control the duration of learning ( using the error estimate on the hold-out validation data subset )
             -  If there are problems with the early stopping we can remove it or change it 
@@ -46,10 +46,10 @@ Tasks:
             -  Use sigmoidal transfer functions in the hidden layers and a linear in the output
             -  Parametrize the regularisation method ( hyperparameter lambda ) and check for the speed of the convergence
     - Simulations and evaluation
-        - check the performance of the best and worst architectures on test data 
-        - Add zero-mean Gaussian noise to training data
+        - check the performance of the best and worst architectures on test data  bruno
+        - Add zero-mean Gaussian noise to training data brun
         - use the best architecture & fix the number of nodes in the first hidden layer and vary the number of nodes in the second use the noise training data 
-        - Add Gaussian noise for the validation data and see the performance of the models using this validation data
+        - Add Gaussian noise for the validation data and see the performance of the models using this validation data 
         - 5 task skip
 
 

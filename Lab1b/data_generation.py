@@ -162,7 +162,7 @@ def generate_time_series_data():
 #! EXAMPLE OF USEGE
 if __name__ == "__main__":
 
-    generate_time_series_data()
+    # generate_time_series_data()
 #     n = 100
 #     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
 #     classA = np.hstack((trainA, validA)) if validA is not None else trainA

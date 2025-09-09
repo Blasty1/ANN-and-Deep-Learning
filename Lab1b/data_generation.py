@@ -118,21 +118,51 @@ def plot_data(classA, classB, type = 'Splited data'):
 
 
 #* FOR Lab1B PART II
-def generate_time_series_data(time_series, n = 1200, t_start = 301, t_stop = 1500):
-    # x_series = np.random.rand(1600)
-    # t = np.arange(300, 1500)
-    # input_data = np.array([x_series[t-20], x_series[t-15], x_series[t-10], x_series[t-5], x_series[t]])
-    # output_data = np.array(x_series[t+5])
-    # X = input_data.T
-    # y = output_data.T
-    # return np.array(X), np.array(y)
-    pass
+def generate_time_series_data():
+    """
+    Generate Mackey-Glass time series data.
+    TODO change for sk-learn MLP compatible format
+    
+    Outputs:
+    X : array (1200, 5) - input vector
+    y : array (1200, )- output vector
+
+    """
+    N = 2000
+    t_start = 300
+    t_stop = 1500
+    b   = 0.1
+    c   = 0.2
+    tau = 17
+
+    time_series = [0.9697, 0.9699, 0.9794, 1.0003, 1.0319, 1.0703, 1.1076, 1.1352, 1.1485,
+        1.1482, 1.1383, 1.1234, 1.1072, 1.0928, 1.0820, 1.0756, 1.0739, 1.0759]
+
+    for n in range(17,N+99):
+        time_series.append(time_series[n] - b*time_series[n] + c*time_series[n-tau]/(1+time_series[n-tau]**10))
+    
+    X = []
+    y = []
+    for t in range(t_start, t_stop):
+        output_data = np.array(time_series[t])
+        input_data = np.array([time_series[t-25], time_series[t-20], time_series[t-15], time_series[t-10], time_series[t-5]])
+        X.append(input_data)
+        y.append(output_data)
+    X = np.array(X)
+    y = np.array(y)
+    # plt.plot(np.arange(300, 1500), X[:, 0])
+    # plt.show()
+    # TODO change for sk-learn MLP compatible format  
+
+    return X, y
+
 
 
 
 #! EXAMPLE OF USEGE
-# if __name__ == "__main__":
-    
+if __name__ == "__main__":
+
+    generate_time_series_data()
 #     n = 100
 #     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
 #     classA = np.hstack((trainA, validA)) if validA is not None else trainA

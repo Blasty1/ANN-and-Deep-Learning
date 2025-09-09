@@ -15,15 +15,41 @@ Rules:
 - Write the answer to the questions and comments into the group chat by quoting the question/task related
 
 Tasks:
-- Code for classic perceptron learning -> Bruno 
-- Code for Delta Rule -> Bruno
-- Adjust the learning rate and study the convergence of the two algorithms -> Fatima
-- Compare sequential with a batch learning approach for the delta rule -> Fatima
-- Remove the bias, train your network with the delta rule in batch mode and test its behaviour -> Bruno
-3.1.3 Task
-- Generation of non linear sample dataset -> Zuzanna
-- Plot the samples -> Zuzanna
-- Apply and compare perceptron learning and the delta rules using either batch or sequential learning mode, similarly as in the previous exercise -> Fatima
-- Apply the delta learning rule in batch mode to this new dataset as well as to different versions of the subsampled data, i.e. before training please remove 25% -> Fatima
-- Report -> Zuzanna
-- Rewatch of the report -> Bruno/Fatima
+- Part 3.1
+    - 3.1.1 Classification of linearly non-separable data
+        - Generate dataset
+        - Try different hidden nodes 
+        - Sampling data to have a training dataset and a validation dataset
+            -  Try different configurations and answer the 4 answers
+            -  at least 3 cases for the number of hidden nodes
+    - 3.1.2 Non-mandatory task ( skip for now )
+    - 3.1.3 Function Approximation
+        - Generate the input and output datapoints for the function
+        - Train the perceptron network 
+            - Show the progress by visualising the output of the netwrok across the training patterns
+            - Experiment with different number of nodes ( 5 tries ) in the hidden layer to see how this parameter affects the final representation.
+        - Evaluate generalisation performance
+            - Train the network with a limited number of available data points ( make a permutation of the vectors patterns and targets and choose only nsamp first patterns , trying different nsamp ).
+            - Validate the performance by reporting the error on all the available data ( training and validation data ) and plot the resulting network's approximations in the 3D space
+            - Report the error estimates of the 4 experiments
+- Part 4
+    - Generate Data
+        - Pick 1200 points from t=301 to 1500
+        - Divide the 1200 samples into 3 non overlapping blocks ( training, validation and testing )
+        - Use the MSE as a measure of performance
+    - Network Configuration
+        - Build an MLP network with 5 inputs and one output
+        - Set up the training process with a batch backprop algorithm and early stopping to control the duration of learning ( using the error estimate on the hold-out validation data subset )
+            -  If there are problems with the early stopping we can remove it or change it 
+            -  Use regularisation technique like the weight decay ( choose a good library and explain its selection )
+            -  Parametrize the number of hidden layes and numbers of layers 
+            -  Use sigmoidal transfer functions in the hidden layers and a linear in the output
+            -  Parametrize the regularisation method ( hyperparameter lambda ) and check for the speed of the convergence
+    - Simulations and evaluation
+        - check the performance of the best and worst architectures on test data 
+        - Add zero-mean Gaussian noise to training data
+        - use the best architecture & fix the number of nodes in the first hidden layer and vary the number of nodes in the second use the noise training data 
+        - Add Gaussian noise for the validation data and see the performance of the models using this validation data
+        - 5 task skip
+
+

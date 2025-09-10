@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 #* FOR LAB1b PART I
 def split_points(n = 100, class_array=None, percent=0.25):
@@ -121,11 +122,10 @@ def plot_data(classA, classB, type = 'Splited data'):
 def generate_time_series_data():
     """
     Generate Mackey-Glass time series data.
-    TODO change for sk-learn MLP compatible format
-    
+    SK-learn MLPREGRESOR link https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
     Outputs:
-    X : array (1200, 5) - input vector
-    y : array (1200, )- output vector
+    X : array (1200, 5) - input vector in MLPRegressor compatible format
+    y : array (1200, ) - output vector in MLPRegressor compatible format
 
     """
     N = 2000
@@ -148,21 +148,48 @@ def generate_time_series_data():
         input_data = np.array([time_series[t-25], time_series[t-20], time_series[t-15], time_series[t-10], time_series[t-5]])
         X.append(input_data)
         y.append(output_data)
+
+    #* change for sk-learn MLPRegressor compatible format
+    #* X must be shape (n_samples, n_features) X.shape = (1200, 5)
+    #* y must be shape (n_samples, ) y.shape = (1200, )
     X = np.array(X)
     y = np.array(y)
     # plt.plot(np.arange(300, 1500), X[:, 0])
     # plt.show()
-    # TODO change for sk-learn MLP compatible format  
-
     return X, y
 
+def split_data_for_train_valid_test(X, y, n = 1200, nr_valid=200, nr_test=200):
+    """
+    Split data for subsets: train 800 samples, valid 200 samples, test 200 samples.
+    
+    Inputs:
+    X : array (1200, 5) - input vector in MLPRegressor compatible format
+    y : array (1200, ) - output vector in MLPRegressor compatible format
+    n : int - total number of samples
+    nr_valid : int - number of samples in valid set
+    nr_test : int - number of samples in test set
+    
+    Outpust:
+    train_X : array (800, 5) - input vector for train set
+    train_y : array (800, ) - output vector for train set
+    valid_X : array (200, 5) - input vector for valid set
+    valid_y : array (200, ) - output vector for valid set
+    test_X : array (200, 5) - input vector for test set
+    test_y : array (200, ) - output vector for test set
+    
+    """
 
-
+    train_X, test_X, train_y, test_y = train_test_split( X,y , random_state=104,test_size=float(nr_test/n), shuffle=True)
+    train_X, valid_X, train_y, valid_y = train_test_split(train_X, train_y, random_state=104,test_size=float(nr_valid/(n-nr_test)), shuffle=True)
+    
+    print("train X shape: ", train_X.shape, "valid X shape: ", valid_X.shape, " test X shape: ", test_X.shape)
+    return train_X, train_y, valid_X, valid_y, test_X, test_y
 
 #! EXAMPLE OF USEGE
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # generate_time_series_data()
+#     X, y = generate_time_series_data()
+#     train_X, train_y, valid_X, valid_y, test_X, test_y = split_data_for_train_valid_test(X, y)
 #     n = 100
 #     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
 #     classA = np.hstack((trainA, validA)) if validA is not None else trainA

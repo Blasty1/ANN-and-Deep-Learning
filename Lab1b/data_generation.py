@@ -178,9 +178,9 @@ def split_data_for_train_valid_test(X, y, n = 1200, nr_valid=200, nr_test=200):
     test_y : array (200, ) - output vector for test set
     
     """
-
-    train_X, test_X, train_y, test_y = train_test_split( X,y , random_state=104,test_size=float(nr_test/n), shuffle=True)
-    train_X, valid_X, train_y, valid_y = train_test_split(train_X, train_y, random_state=104,test_size=float(nr_valid/(n-nr_test)), shuffle=True)
+    #shuffle=False to keep the time series order
+    train_X, test_X, train_y, test_y = train_test_split( X,y , random_state=104,test_size=float(nr_test/n), shuffle=False)
+    train_X, valid_X, train_y, valid_y = train_test_split(train_X, train_y, random_state=104,test_size=float(nr_valid/(n-nr_test)), shuffle=False)
     
     print("train X shape: ", train_X.shape, "valid X shape: ", valid_X.shape, " test X shape: ", test_X.shape)
     return train_X, train_y, valid_X, valid_y, test_X, test_y

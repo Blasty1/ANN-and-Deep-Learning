@@ -81,7 +81,7 @@ def generate_splited_data(n, percent_of_A = 0.25, percent_of_B = 0.25, task_d = 
         classA_x2_train = classA_x2[0][: new_n]
         classA_x2_valid = classA_x2[0][new_n :]
         trainA = np.vstack((classA_x1, classA_x2_train))
-        percent_of_A = np.vstack((classA_x1_valid, classA_x2_valid))
+        valid_A = np.vstack((classA_x1_valid, classA_x2_valid))
 
     else:
         classA_x2 = np.random.randn(1, n) * sigmaA + mA[1]
@@ -93,25 +93,25 @@ def generate_splited_data(n, percent_of_A = 0.25, percent_of_B = 0.25, task_d = 
     classB[1, :] += mB[1]
 
     if percent_of_A > 0:
-        trainA, percent_of_A = split_points(n, classA, percent_of_A)
+        trainA, valid_A = split_points(n, classA, percent_of_A)
     elif not task_d:
         trainA = classA
-        percent_of_A = None
+        valid_A = None
     if percent_of_B > 0:
-        trainB, percent_of_B = split_points(n, classB, percent_of_B)
+        trainB, valid_B = split_points(n, classB, percent_of_B)
     else:
         trainB = classB
-        percent_of_B = None
-    
-    return trainA, percent_of_A, trainB, percent_of_B
+        valid_B = None
+
+    return trainA.T, valid_A.T if valid_A is not None else valid_A, trainB.T, valid_B.T if valid_B is not None else valid_B
 
 def plot_data(classA, classB, type = 'Splited data'):
     plt.figure(figsize=(10, 8))
-    plt.scatter(classA[0, :], classA[1, :], c='red', alpha=0.7, label='Class A', s=50)
-    plt.scatter(classB[0, :], classB[1, :], c='blue', alpha=0.7, label='Class B', s=50)
+    plt.scatter(classA[:, 0], classA[:, 1], c='red', alpha=0.7, label='Class A', s=50)
+    plt.scatter(classB[:, 0], classB[:, 1], c='blue', alpha=0.7, label='Class B', s=50)
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
-    plt.title(f'{type} Non Linearly-Separable Data for Binary Classification')
+    plt.title(f'{type} Linearly Non-Separable Data for Binary Classification')
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.axis('equal')
@@ -186,15 +186,16 @@ def split_data_for_train_valid_test(X, y, n = 1200, nr_valid=200, nr_test=200):
     return train_X, train_y, valid_X, valid_y, test_X, test_y
 
 #! EXAMPLE OF USEGE
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
 #     X, y = generate_time_series_data()
-#     train_X, train_y, valid_X, valid_y, test_X, test_y = split_data_for_train_valid_test(X, y)
-#     n = 100
-#     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
-#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
-#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
-#     plot_data(classA, classB, type='Splited ALL')
+    # train_X, train_y, valid_X, valid_y, test_X, test_y = split_data_for_train_valid_test(X, y)
+    n = 100
+    trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
+    classA = np.hstack((trainA, validA)) if validA is not None else trainA
+    classB = np.hstack((trainB, validB)) if validB is not None else trainB
+    print(classA.shape, classB.shape)
+    plot_data(classA, classB, type='Splited ALL')
 
 #     trainA, validA, trainB, validB = generate_splited_data(n, 0.25, 0.25)
 #     # For show all points

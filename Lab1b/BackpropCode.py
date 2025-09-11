@@ -2,15 +2,13 @@
 import numpy as np
 
 ## Activation function used in the code
-def relu(x):
-    return np.maximum(0, x)
+def activation_function(x):
+    return 2/(1+np.exp(-x)) - 1
 
-def relu_deriv(x):
-    return (x > 0).astype(float)
+def af_derivative(x):
+    return  0.5*(1 + activation_function(x))*(1 - activation_function(x))
 
-def softmax(x):
-    exp_x = np.exp(x - np.max(x, axis=0, keepdims=True))
-    return exp_x / np.sum(exp_x, axis=0, keepdims=True)
+
 #############
 
 #### HOW IT WORKS?
@@ -47,17 +45,16 @@ class NeuralNetwork:
         return teta
 
     def forward(self,X):
+        # we are interested the bias , so we are increasing the rows of the input matrice
         cache = {"A0" : np.vstack([X, np.ones((1,X.shape[1]))])} # we save some important values for other computations
         
         # we start from 1 because the input layer is not considered
         for i in range(1, len(self.layer_sizes)):
             A_i_pre_activation_function = self.weights[f"W{i}"] @ cache[f"A{i-1}"]
-            A_i 
+            A_i = activation_function(A_i_pre_activation_function)
+            
             if i < len(self.layer_sizes) - 1:  # hidden layer
-                A_i = relu(A_i_pre_activation_function)
-                
-            else:  # output layer
-                A_i = softmax(A_i_pre_activation_function)
+                A_i = np.vstack([A_i, np.ones((1, A_i.shape[1]))]) # Add bias for the next layer
 
             cache[f"A{i}"] = A_i
             cache[f"A{i}_pre_activation_function"] = A_i_pre_activation_function
@@ -66,26 +63,36 @@ class NeuralNetwork:
 
     def backward(self,cache,targets):
         gradients = {} # delta * input
+        deltas = {}
         L = len(self.layer_sizes) - 1 # number of layers with weights
         
         # Output layer signal error 
-        gradients[f"dW{L}"] = ( ( cache[f"A{L}"] - targets ) * relu_deriv(cache[f"A{L}__pre_activation_function"]) ) @ cache["A{L-1}"]
+        deltas[f"delta_{L}"] = (cache[f"A{L}"] - targets) * af_derivative(cache[f"A{L}_pre_activation_function"])
+        gradients[f"dW{L}"] =  deltas[f"delta_{L}"]  @ cache[f"A{L-1}"].T
         
-        
+
+
         # we go through the hidden layer for computing the error signals
         for i in reversed(range(1, L)):
             # V^T @ signal error matrice of the last iteration  * derivative
-            delta = (self.weights[f"W{i+1}"].T @ cache[f"delta_{i+1}"]) * relu_deriv(cache[f"A{i}__pre_activation_function"])
+            weight_multiplied_by_signal_errors = (self.weights[f"W{i+1}"].T @ deltas[f"delta_{i+1}"]) 
             
             # we remove the extra row that we previously added to the forward pass to take care of the bias term
-            delta  = delta[:-1,:]
-            gradients[f"dW{i}"] = delta @ cache["A{i-1}"]
+            weight_multiplied_by_signal_errors  = weight_multiplied_by_signal_errors[:-1,:]
+            
+            new_delta = weight_multiplied_by_signal_errors * af_derivative(cache[f"A{i}_pre_activation_function"])
+            
+    
+            # we update the delta
+            deltas[f"delta_{i}"] = new_delta
+            
+            gradients[f"dW{i}"] = new_delta @ cache[f"A{i-1}"].T
 
         return gradients
     
     def update_weights(self, gradients):
 
-        for i in range(1,len(self.layer_size)):
+        for i in range(1,len(self.layer_sizes)):
 
             ### Momentum term -> alpha * teta - (1-alpha) * gradient
             teta = self.coefficient_of_the_momentum*self.momentums[f"teta{i}"] - (1-self.coefficient_of_the_momentum)*gradients[f"dW{i}"]

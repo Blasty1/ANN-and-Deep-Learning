@@ -107,8 +107,8 @@ def generate_splited_data(n, percent_of_A = 0.25, percent_of_B = 0.25, task_d = 
 
 def plot_data(classA, classB, type = 'Splited data'):
     plt.figure(figsize=(10, 8))
-    plt.scatter(classA[:, 0], classA[:, 1], c='red', alpha=0.7, label='Class A', s=50)
-    plt.scatter(classB[:, 0], classB[:, 1], c='blue', alpha=0.7, label='Class B', s=50)
+    plt.scatter(classA[0, :], classA[1, :], c='red', alpha=0.7, label='Class A', s=50)
+    plt.scatter(classB[0, :], classB[1, :], c='blue', alpha=0.7, label='Class B', s=50)
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
     plt.title(f'{type} Linearly Non-Separable Data for Binary Classification')

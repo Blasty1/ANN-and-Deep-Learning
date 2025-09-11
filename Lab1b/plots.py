@@ -2,7 +2,28 @@ import matplotlib.pyplot as plt
 import data_generation as data
 import part2 as p
 import numpy as np
+import os
 
+def plot_learning_curve(MSEs,filename=None):
+    """
+    Ploting error convergence.
+    
+    Inputs:
+    MSEs : array - contains mean squere error from each epoch
+
+    """
+    fig = plt.figure()
+    ax = plt.axes()
+    x_values = range(len(MSEs))
+    ax.plot(x_values, MSEs, linestyle='-')
+    plt.title('Error convergence')
+    plt.xlabel('Epoch')
+    plt.ylabel('Error')
+    plt.grid(True)
+    if(filename != None):
+        os.makedirs('Lab1\\3_1_3_plots\\', exist_ok=True)
+        plt.savefig(f'Lab1\\3_1_3_plots\\{filename}.png')
+    plt.show()
 
 # Part II
 # Plot mackey-glass time series data
@@ -20,7 +41,7 @@ def plot_mackey_glass_data():
     plt.grid(True)
     plt.show()
 
-plot_mackey_glass_data(    )
+
 
 # Plot showing training and validation MSE for different alpha values
 def plot_alpha_choices():
@@ -36,7 +57,9 @@ def plot_alpha_choices():
     plt.legend()
     plt.show()
 
-plot_alpha_choices()
+if __name__ == "__main__":
+    plot_mackey_glass_data()
+    plot_alpha_choices()
 
 
 

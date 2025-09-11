@@ -25,12 +25,9 @@ HIDDEN_LAYERS = [20,20,20,20] # number of nodes per hidden layer
 
 network = BackpropCode.NeuralNetwork(NUMBER_OF_INPUTS + HIDDEN_LAYERS + NUMBER_OF_OUTPUTS )
 
-MSEs = network.train(X,targets, 100)
-plots.plot_learning_curve(MSEs)
+[MSEs,ratios] = network.train(X,targets, 100)
+#plotting MSE over epoch
+plots.plot_curve_over_epoch(MSEs, title="MSE_over_epoch", filename="MSE_over_epoch")
 
-plot_decision_boundary(network, X_A, X_B)
-plt.show()
-
-# Or for a simpler visualization:
-plot_decision_regions(network, X_A, X_B)
-plt.show()
+#plotting mislcassification ratio over epoch
+plots.plot_curve_over_epoch(ratios, title="Ratio of misclassifications over epoch",filename="Ratio_of_misclassifications_over_epoch")

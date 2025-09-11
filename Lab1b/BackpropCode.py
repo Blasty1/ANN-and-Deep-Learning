@@ -107,6 +107,7 @@ class NeuralNetwork:
     def train(self,X, targets, epochs):
         # it contains the MSE for each epoch
         MSEs = []
+        ratioOfMisclassifications = []
         L=len(self.layer_sizes)-1
         for epoch in range(epochs):
             cache = self.forward(X)
@@ -114,6 +115,7 @@ class NeuralNetwork:
             self.update_weights(gradients)
             
             MSEs.append( np.mean((cache[f"A{L}"] - targets)**2) )
+            ratioOfMisclassifications.append(np.mean( ( (cache[f"A{L}"] > 0).astype(int) != (targets > 0).astype(int) ).astype(int) ))
         
-        return MSEs
+        return (MSEs, ratioOfMisclassifications)
 

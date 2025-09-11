@@ -126,7 +126,7 @@ def plot_decision_regions(network, X_A, X_B, resolution=200):
     return plt
 
 
-def plot_learning_curve(MSEs,filename=None):
+def plot_curve_over_epoch(MSEs,title=None,filename=None):
     """
     Ploting error convergence.
     
@@ -138,13 +138,13 @@ def plot_learning_curve(MSEs,filename=None):
     ax = plt.axes()
     x_values = range(len(MSEs))
     ax.plot(x_values, MSEs, linestyle='-')
-    plt.title('Error convergence')
+    plt.title(f'Learning Curve - {title}')
     plt.xlabel('Epoch')
     plt.ylabel('Error')
     plt.grid(True)
     if(filename != None):
-        os.makedirs('Lab1\\3_1_3_plots\\', exist_ok=True)
-        plt.savefig(f'Lab1\\3_1_3_plots\\{filename}.png')
+        save_path = os.path.join('Lab1b', 'Task_3', 'Plots', f'{filename}.png')
+        plt.savefig(save_path)
     plt.show()
 
 # Part II

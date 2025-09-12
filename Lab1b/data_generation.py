@@ -185,6 +185,25 @@ def split_data_for_train_valid_test(X, y, n = 1200, nr_valid=200, nr_test=200):
     # print("train X shape: ", train_X.shape, "valid X shape: ", valid_X.shape, " test X shape: ", test_X.shape)
     return train_X, train_y, valid_X, valid_y, test_X, test_y
 
+def add_noise(X, variance=0.01):
+    """
+    Add Gaussian noise to the input data.
+    
+    Inputs:
+    X : array - input data
+    variance : float - variance of the Gaussian noise
+
+    Outputs:
+    X_noisy : array - input data with added noise
+    
+    """
+    std = np.sqrt(variance)
+    noise = np.random.normal(loc=0.0, scale=std, size=X.shape)
+    X_noisy = X + noise
+    return X_noisy
+
+
+
 #! EXAMPLE OF USEGE
 # if __name__ == "__main__":
 

@@ -118,4 +118,20 @@ class NeuralNetwork:
             ratioOfMisclassifications.append(np.mean( ( (cache[f"A{L}"] > 0).astype(int) != (targets > 0).astype(int) ).astype(int) ))
         
         return (MSEs, ratioOfMisclassifications)
-
+    
+    # it evaluate the validation dataset after each epoch during training
+    def train_evaluate(self,X, Y, patterns, epochs):
+        # it contains the MSE for each epoch
+        train_MSEs = []
+        predictions = []
+        L=len(self.layer_sizes)-1
+        for epoch in range(epochs):
+            cache = self.forward(X)
+            gradients = self.backward(cache, Y)
+            self.update_weights(gradients)
+            cache_prediction = self.forward(patterns) # test on the whole dataset
+            prediction = cache_prediction[f"A{L}"]         # select the output layer
+            predictions.append(prediction)
+            train_MSEs.append( np.mean((cache[f"A{L}"] - Y)**2) )
+        
+        return train_MSEs, predictions

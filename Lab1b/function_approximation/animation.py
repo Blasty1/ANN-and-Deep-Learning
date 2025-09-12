@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 from matplotlib import animation
-import Lab1b.function_approximation.part3_1_3 as f
+import part3_1_3 as f
 
-def animate_wireframe(xx, yy, z_true, z_pred_list, interval=200):
+def animate_wireframe(xx, yy, z_true, z_pred_list, interval=200, save_path=None):
     fig = plt.figure(figsize=(7, 5))
     ax = fig.add_subplot(111, projection='3d')
 
@@ -35,10 +35,9 @@ def animate_wireframe(xx, yy, z_true, z_pred_list, interval=200):
         fig, update, init_func=init,
         frames=len(z_pred_list), interval=interval, blit=False, repeat=False
     )
-    # ani.save(save_path, writer=animation.PillowWriter(fps=max(1, 1000 // interval)))
-    plt.show()   
+    ani.save(save_path, writer=animation.PillowWriter(fps=max(1, 1000 // interval)))
+    # plt.show()   
     return ani
-# ani = animate_wireframe(xx, yy, z, z_predictions, interval=200)
 
-_ = animate_wireframe(f.xx, f.yy, f.z, f.z_predictions, interval=200)
+_ = animate_wireframe(f.xx, f.yy, f.z, f.z_predictions, interval=200, save_path='animation25.gif')
 ####

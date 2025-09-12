@@ -108,8 +108,8 @@ def nodes_mse(train_X, train_y, patterns, targets,epochs):
         layer_sizes = [2, i, 1]  # [input, hidden, output]
         model = NeuralNetwork(layer_sizes=layer_sizes)
         train_MSEs, predictions = model.train_evaluate(train_X, train_y, patterns, epochs)
-        valid_MSEs = [np.mean((prediction - targets) ** 2) for prediction in predictions]
-        v_mses.append(valid_MSEs[-1])
+        valid_MSEs = np.mean((np.array(predictions[-1]) - targets) ** 2) 
+        v_mses.append(valid_MSEs)
         t_mses.append(train_MSEs[-1])
     return t_mses, v_mses
 
@@ -128,9 +128,9 @@ def plot_nodes_vs_mse(t_mses, v_mses):
 
 
 # --- Model Setup and Training ---
-nnodes = 11 # Number of nodes in the hidden layer
-epochs = 50
-fraction = 0.2
+nnodes = 25 # Number of nodes in the hidden layer
+epochs = 100
+fraction = 0.5
 
 layer_sizes = [2, nnodes, 1]  # [input, hidden, output]
 patterns, targets, z, xx, yy = generate_data()
@@ -138,9 +138,9 @@ train_X, train_y = split_data(patterns, targets, fraction)
 
 
 train_MSEs, valid_MSEs, predictions = train_and_evaluate(layer_sizes, train_X, train_y, patterns, targets, epochs)
-plot_mse_over_epochs(train_MSEs, valid_MSEs, epochs, nnodes)
+# plot_mse_over_epochs(train_MSEs, valid_MSEs, epochs, nnodes)
 z_predictions = [prediction.reshape(z.shape[0], z.shape[0]) for prediction in predictions]
 
 t_mses, v_mses = nodes_mse(train_X, train_y, patterns, targets, epochs)
 print(f"Train MSE: {t_mses[-1]}, Valid MSE: {v_mses[-1]}, generalization gap: {v_mses[-1]-t_mses[-1]}")
-plot_nodes_vs_mse(t_mses,v_mses)
+# plot_nodes_vs_mse(t_mses,v_mses)

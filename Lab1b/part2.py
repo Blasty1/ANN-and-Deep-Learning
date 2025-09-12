@@ -7,7 +7,7 @@ max_iter = 10000
 X, y = data.generate_time_series_data()
 train_X, train_y, valid_X, valid_y, test_X, test_y = data.split_data_for_train_valid_test(X, y)
 
-def train_mlp(alpha, learning_rate, hidden_layers=(7, 7, 7), early_stopping=True):
+def train_mlp(train_X, train_y, valid_X, valid_y, alpha, learning_rate, hidden_layers=(7, 5), early_stopping=True, max_iter=10000, random_state=32):
     """
     Trains an MLPRegressor with the given hyperparameters and returns the train and validation MSEs, and the trained model.
     
@@ -28,7 +28,7 @@ def train_mlp(alpha, learning_rate, hidden_layers=(7, 7, 7), early_stopping=True
             alpha=alpha,
             early_stopping=early_stopping,
             max_iter=max_iter,
-            random_state=42,
+            random_state=random_state,
             learning_rate_init=learning_rate
         )
     mlp_reg.fit(train_X, train_y)
@@ -66,7 +66,7 @@ def alpha_choice(alphas=alphas, learning_rate =0.1, hidden_layers=(7, 7, 7),  ea
 
 # Choosed alpha = 0.01 based on the genralization gap and to avoid underfitting 
 
-# Choosing the best learning rate
+# Choosing the best learning rate 0.1
 learning_rates = [0.0001, 0.001, 0.01, 0.1, 0.2]
 def lr_convergence_times(alpha=0.01, learning_rates=learning_rates, hidden_layers=(7, 7, 7), early_stopping=True):
     """

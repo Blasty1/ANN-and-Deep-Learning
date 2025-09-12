@@ -182,22 +182,22 @@ def split_data_for_train_valid_test(X, y, n = 1200, nr_valid=200, nr_test=200):
     train_X, test_X, train_y, test_y = train_test_split( X,y , random_state=104,test_size=float(nr_test/n), shuffle=False)
     train_X, valid_X, train_y, valid_y = train_test_split(train_X, train_y, random_state=104,test_size=float(nr_valid/(n-nr_test)), shuffle=False)
     
-    print("train X shape: ", train_X.shape, "valid X shape: ", valid_X.shape, " test X shape: ", test_X.shape)
+    # print("train X shape: ", train_X.shape, "valid X shape: ", valid_X.shape, " test X shape: ", test_X.shape)
     return train_X, train_y, valid_X, valid_y, test_X, test_y
 
 #! EXAMPLE OF USEGE
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-#     X, y = generate_time_series_data()
-    # train_X, train_y, valid_X, valid_y, test_X, test_y = split_data_for_train_valid_test(X, y)
-    n = 100
-    trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
-    classA = np.hstack((trainA, validA)) if validA is not None else trainA
-    classB = np.hstack((trainB, validB)) if validB is not None else trainB
-    print(classA.shape, classB.shape)
-    plot_data(classA, classB, type='Splited ALL')
+# #     X, y = generate_time_series_data()
+#     # train_X, train_y, valid_X, valid_y, test_X, test_y = split_data_for_train_valid_test(X, y)
+#     n = 100
+#     trainA, validA, trainB, validB = generate_splited_data(n, 0.0, 0.0)
+#     classA = np.hstack((trainA, validA)) if validA is not None else trainA
+#     classB = np.hstack((trainB, validB)) if validB is not None else trainB
+#     print(classA.shape, classB.shape)
+#     plot_data(classA, classB, type='Splited ALL')
 
-#     trainA, validA, trainB, validB = generate_splited_data(n, 0.25, 0.25)
+# #     trainA, validA, trainB, validB = generate_splited_data(n, 0.25, 0.25)
 #     # For show all points
 #     classA = np.hstack((trainA, validA)) if validA is not None else trainA
 #     classB = np.hstack((trainB, validB)) if validB is not None else trainB

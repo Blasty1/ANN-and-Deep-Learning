@@ -1,0 +1,73 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import sys
+import os
+sys.path.append(os.path.abspath("Lab1b/"))
+from BackpropCode import NeuralNetwork
+import part3_1_3 as p
+
+
+
+def add_noise_to_targets(y, sigma, rng=None):
+    # Add zero-mean Gaussian noise with std=sigma to targets training set
+   
+    if rng is None:
+        rng = np.random.default_rng(123)
+    return y + rng.normal(loc=0.0, scale=sigma, size=y.shape)
+
+def nodes_mse_with_noise(train_X, train_y, patterns, targets, epochs, sigmas, nodes_range=range(1, 26), repeats=5):
+    # conduct repeated runs for each noise level and hidden node to reduce randomness
+
+    results = {}
+    base_rng = np.random.default_rng(2025)
+
+    for sigma in sigmas:
+        avg_train = []
+        avg_valid = []
+        for n in nodes_range:
+            t_mse_runs, v_mse_runs = [], []
+            for _ in range(repeats):
+                # noise for targets only
+                noisy_train_y = add_noise_to_targets(train_y, sigma, rng=base_rng)
+
+                layer_sizes = [2, n, 1]
+                model = NeuralNetwork(layer_sizes=layer_sizes)
+
+                train_MSEs, predictions = model.train_evaluate(train_X, noisy_train_y, patterns, epochs)
+                final_train = float(train_MSEs[-1])
+                final_valid = float(np.mean((np.array(predictions[-1]) - targets) ** 2))
+
+                t_mse_runs.append(final_train)
+                v_mse_runs.append(final_valid)
+
+            avg_train.append(np.mean(t_mse_runs))
+            avg_valid.append(np.mean(v_mse_runs))
+
+        results[sigma] = {
+            'nodes': list(nodes_range),
+            'train_mse': avg_train,
+            'valid_mse': avg_valid
+        }
+    return results
+
+def plot_nodes_vs_mse_for_noise(results):
+
+    # One figure per sigma
+    
+    import matplotlib.pyplot as plt
+
+    for sigma, data in results.items():
+        plt.figure()
+        plt.plot(data['nodes'], data['valid_mse'], marker='o', label='Validation MSE')
+        plt.plot(data['nodes'], data['train_mse'], marker='+', label='Training MSE')
+        plt.title(f"Hidden Nodes vs MSE (train targets noise σ={sigma})")
+        plt.xlabel("Number of Hidden Nodes")
+        plt.ylabel("Final MSE")
+        plt.grid(True)
+        plt.legend()
+        plt.show()
+
+
+
+results = nodes_mse_with_noise(p.train_X, p.train_y, p.patterns, p.targets, epochs=40, sigmas=[0.0, 0.1, 0.2], nodes_range=range(1, 26), repeats=5)
+plot_nodes_vs_mse_for_noise(results)

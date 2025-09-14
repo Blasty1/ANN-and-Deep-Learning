@@ -119,6 +119,37 @@ class NeuralNetwork:
         
         return (MSEs, ratioOfMisclassifications)
     
+    def train_with_validation_set(self,X_train, Y_train,X_validation,Y_validation, epochs, number_of_epochs_for_validation=10):
+        """ it trains the network using a validation set to monitor the overfitting, returns two MSEs, one for the training set and one for the validation set
+        Args:
+            X_train (_type_): t
+            Y_train (_type_): _description_
+            X_validation (_type_): _description_
+            Y_validation (_type_): _description_
+            epochs (_type_): _description_
+            number_of_epochs_for_validation (int, optional): after each epoches we compiute the MSEs for training and validation dataset. Defaults to 10.
+
+        Returns:
+            : _description_
+        """
+        
+        # it contains the MSE for each epoch
+        MSEs_train_error = []
+        MSEs_validation_error = []
+        L=len(self.layer_sizes)-1
+        for epoch in range(epochs):
+            cache = self.forward(X_train)
+            gradients = self.backward(cache, Y_train)
+            self.update_weights(gradients)
+                    
+            
+            if epoch % number_of_epochs_for_validation == 0:
+                cache_validation = self.forward(X_validation)
+                MSEs_validation_error.append( np.mean((cache_validation[f"A{L}"] - Y_validation)**2) ) 
+                MSEs_train_error.append( np.mean((cache[f"A{L}"] - Y_train)**2) )
+       
+        return MSEs_train_error, MSEs_validation_error
+    
     # it evaluate the validation dataset after each epoch during training
     def train_evaluate(self,X, Y, patterns, epochs):
         # it contains the MSE for each epoch
@@ -135,3 +166,57 @@ class NeuralNetwork:
             train_MSEs.append( np.mean((cache[f"A{L}"] - Y)**2) )
         
         return train_MSEs, predictions
+    
+    
+    ######### Online Training
+        
+        
+    def train_online_with_validation_set(self,X_train, Y_train,X_validation,Y_validation, epochs, number_of_epochs_for_validation=10):
+        """ it trains the network using a validation set to monitor the overfitting and an online approach, returns two MSEs, one for the training set and one for the validation set
+        Args:
+            X_train (_type_): t
+            Y_train (_type_): _description_
+            X_validation (_type_): _description_
+            Y_validation (_type_): _description_
+            epochs (_type_): _description_
+            number_of_epochs_for_validation (int, optional): after each epoches we compiute the MSEs for training and validation dataset. Defaults to 10.
+
+        Returns:
+            : _description_
+        """
+        
+        # it contains the MSE for each epoch
+        MSEs_train_error = []
+        MSEs_validation_error = []
+        L=len(self.layer_sizes)-1
+        for epoch in range(epochs):
+            
+            # Shuffle the order of samples for each epoch
+            indices = np.random.permutation(X_train.shape[1])
+            epoch_mse = 0
+            epoch_misclass = 0
+            
+            for index in indices:
+                X_train_sample = X_train[:, index:index+1]  # Select a single sample
+                Y_train_sample = Y_train[:, index:index+1]  # Select the corresponding target
+                
+                # Forward pass for single sample
+                cache = self.forward(X_train_sample)
+                
+                # Backward pass for single sample
+                gradients = self.backward(cache, Y_train_sample)
+                
+                # Update weights immediately after each sample
+                self.update_weights(gradients)
+                
+                # Accumulate error for epoch statistics
+                prediction = cache[f"A{L}"]
+                epoch_mse += np.mean((prediction - Y_train_sample)**2)
+                epoch_misclass += np.mean(((prediction > 0).astype(int) != (Y_train_sample > 0).astype(int)).astype(int))
+
+            if epoch % number_of_epochs_for_validation == 0:
+                cache_validation = self.forward(X_validation)
+                MSEs_validation_error.append( np.mean((cache_validation[f"A{L}"] - Y_validation)**2) ) 
+                MSEs_train_error.append(epoch_mse / X_train.shape[1])       
+       
+        return MSEs_train_error, MSEs_validation_error

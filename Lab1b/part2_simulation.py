@@ -50,6 +50,29 @@ print(f"Best Configuration: {best_config} with Valid MSE: {(1-results[best_confi
 print(f"Worst Configuration: {worst_config} with Valid MSE: {(1-results[worst_config]['mlp_reg'].validation_scores_[-1]):.4f}")
 #print(f"Best model scores: {best_model.loss_curve_}, valid score: {best_model.validation_scores_}")
 
+# TODO Plot lerning valid curve with train curev for best and worst model
+plt.figure(figsize=(10,10))
+plt.plot(best_model.loss_curve_, label='Best Model Train Loss', color='green')
+plt.plot([1 - score for score in best_model.validation_scores_], label='Best Model Valid Loss', color='blue')
+plt.title('Best Model Learning Curves')
+plt.xlabel('Iterations')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True)
+plt.savefig('Lab1b\\best_config_loss.png')
+plt.show()
+
+plt.figure(figsize=(10,10))
+plt.plot(worst_model.loss_curve_, label='Worst Model Train Loss', color='green')
+plt.plot([1 - score for score in worst_model.validation_scores_], label='Worst Model Valid Loss', color='blue')
+plt.title('Worst Model Learning Curves')
+plt.xlabel('Iterations')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True)
+plt.savefig('Lab1b\\worst_config_loss.png')
+plt.show()
+
 # // TODO Random weights initialization
 print("\n", "="*50, "\n")
 print("Random weights initialization test for best and worst configuration")

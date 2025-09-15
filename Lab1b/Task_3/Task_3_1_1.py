@@ -40,8 +40,8 @@ cache = {}
 #First case: 25% of class A and 25% of class B
 trainA1, validA1, trainB1, validB1 = data_generation.generate_splited_data(
     n=100,  
-    percent_of_A=0.25,
-    percent_of_B=0.25,
+    percent_of_A=0.75,
+    percent_of_B=0.75,
     task_d=False
 )
 cache['trainA1'] = trainA1.T
@@ -54,7 +54,7 @@ cache['validB1'] = validB1.T if validB1 is not None else None
 trainA2, validA2, trainB2, validB2 = data_generation.generate_splited_data(
     n=100,  
     percent_of_A=0.5,
-    percent_of_B=0.0,
+    percent_of_B=1.0,
     task_d=False
 )
 cache['trainA2'] = trainA2.T
@@ -68,7 +68,7 @@ cache['validB2'] = validB2.T if validB2 is not None else None
 trainA3, validA3, trainB3, validB3 = data_generation.generate_splited_data(
     n=100,  
     percent_of_A=0.0,
-    percent_of_B=0.0,
+    percent_of_B=1.0,
     task_d=True
 )
 cache['trainA3'] = trainA3.T
@@ -83,7 +83,7 @@ for i in range(1,4):
     X_train, targets_train, X_validation , targets_validation  = data_generation.prepare_train_valid_dataset(cache[f"trainA{i}"],cache[f"trainB{i}"],cache[f"validA{i}"],cache[f"validB{i}"])
     NUMBER_OF_INPUTS = [X_train.shape[0]]
     NUMBER_OF_OUTPUTS = [1]
-    HIDDEN_LAYERS = [2] # number of nodes per hidden layer
+    HIDDEN_LAYERS = [80] # number of nodes per hidden layer
     
     network = BackpropCode.NeuralNetwork(NUMBER_OF_INPUTS + HIDDEN_LAYERS + NUMBER_OF_OUTPUTS )
     MSEs_training, MSEs_validation = network.train_with_validation_set(X_train,targets_train,X_validation,targets_validation, 100)
@@ -135,4 +135,36 @@ for i in range(1,4):
     if(filename != None):
         save_path = os.path.join('Lab1b', 'Task_3', 'Plots', f'{filename}.png')
         plt.savefig(save_path)
+    plt.show()
+    
+    
+    ##### plot the decision boundaries
+    #### we use all the samples of our dataset to plot the decision boundaries
+    X_A = np.hstack([cache[f"trainA{i}"], cache[f"validA{i}"]])
+    X_B = None
+    
+    if(cache[f"validB{i}"] is None):
+        X_B = cache[f"trainB{i}"]
+    else:
+        X_B = np.hstack([cache[f"trainB{i}"], cache[f"validB{i}"]])
+        
+    plots.plot_decision_regions(network,X_A,X_B)
+    plt.title(f'Decision Boundary - Case {i} - {HIDDEN_LAYERS[0]} hidden units')
+    filename=f"Decision_Boundary_Case_{i}_{HIDDEN_LAYERS[0]}_hidden_units"
+    
+    save_path = os.path.join('Lab1b', 'Task_3', 'Plots', f'{filename}.png')
+    plt.savefig(save_path)
+    plt.show()
+    
+    ##### plot the decision boundaries
+    #### we use only the training data samples
+    X_A = cache[f"trainA{i}"]
+    X_B = cache[f"trainB{i}"]
+    
+    plots.plot_decision_regions(network,X_A,X_B)
+    plt.title(f'Decision Boundary - Training Data Samples - Case {i}')
+    filename=f"Decision_Boundary_Case_{i}_training_data_samples"
+    
+    save_path = os.path.join('Lab1b', 'Task_3', 'Plots', f'{filename}.png')
+    plt.savefig(save_path)
     plt.show()

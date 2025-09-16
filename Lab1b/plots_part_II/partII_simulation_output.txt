@@ -1,0 +1,135 @@
+1. Generating data spliting for train and test sets
+Train X shape:  (1000, 5)  Test X shape:  (200, 5)
+Train Y shape:  (1000,)  Test Y shape:  (200,)
+
+ ==================================================
+
+2. Testing different configuration of hidden layers
+Hidden layer 1 nodes:  [3, 4, 5]
+Hidden layer 2 nodes:  [2, 4, 6]
+Trening results:
+Hidden Layers: (3, 2) - Train MSE: 0.0283, Valid MSE: 0.9996
+Hidden Layers: (3, 4) - Train MSE: 0.0017, Valid MSE: 0.0133
+Hidden Layers: (3, 6) - Train MSE: 0.0020, Valid MSE: 0.0125
+Hidden Layers: (4, 2) - Train MSE: 0.0287, Valid MSE: 1.0002
+Hidden Layers: (4, 4) - Train MSE: 0.0017, Valid MSE: 0.0326
+Hidden Layers: (4, 6) - Train MSE: 0.0019, Valid MSE: 0.0155
+Hidden Layers: (5, 2) - Train MSE: 0.0283, Valid MSE: 1.0417
+Hidden Layers: (5, 4) - Train MSE: 0.0021, Valid MSE: 0.0428
+Hidden Layers: (5, 6) - Train MSE: 0.0024, Valid MSE: 0.0150
+(3, 6)
+Best Configuration: (3, 6) with Valid MSE: 0.0125
+Worst Configuration: (5, 2) with Valid MSE: 1.0417
+
+ ================================================== 
+
+Random weights initialization test for best and worst configuration
+{'best': {12: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(3, 6), learning_rate_init=0.1, max_iter=10000,
+             random_state=12)}, 24: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(3, 6), learning_rate_init=0.1, max_iter=10000,
+             random_state=24)}, 38: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(3, 6), learning_rate_init=0.1, max_iter=10000,
+             random_state=38)}, 42: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(3, 6), learning_rate_init=0.1, max_iter=10000,
+             random_state=42)}, 53: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(3, 6), learning_rate_init=0.1, max_iter=10000,
+             random_state=53)}, 67: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(3, 6), learning_rate_init=0.1, max_iter=10000,
+             random_state=67)}}, 'worst': {12: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(5, 2), learning_rate_init=0.1, max_iter=10000,
+             random_state=12)}, 24: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(5, 2), learning_rate_init=0.1, max_iter=10000,
+             random_state=24)}, 38: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(5, 2), learning_rate_init=0.1, max_iter=10000,
+             random_state=38)}, 42: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(5, 2), learning_rate_init=0.1, max_iter=10000,
+             random_state=42)}, 53: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(5, 2), learning_rate_init=0.1, max_iter=10000,
+             random_state=53)}, 67: {MLPRegressor(activation='logistic', alpha=0.01, early_stopping=True,
+             hidden_layer_sizes=(5, 2), learning_rate_init=0.1, max_iter=10000,
+             random_state=67)}}}
+Random seed test results:
+
+Model type: best
+Seed: 12 - Train MSE: 0.0022, Valid MSE: 0.0152
+Seed: 24 - Train MSE: 0.0049, Valid MSE: 0.0891
+Seed: 38 - Train MSE: 0.0018, Valid MSE: 0.0164
+Seed: 42 - Train MSE: 0.0018, Valid MSE: 0.0112
+Seed: 53 - Train MSE: 0.0021, Valid MSE: 0.0236
+Seed: 67 - Train MSE: 0.0018, Valid MSE: 0.0124
+
+Model type: worst
+Seed: 12 - Train MSE: 0.0046, Valid MSE: 0.1246
+Seed: 24 - Train MSE: 0.0290, Valid MSE: 0.9990
+Seed: 38 - Train MSE: 0.0285, Valid MSE: 1.0309
+Seed: 42 - Train MSE: 0.0019, Valid MSE: 0.0165
+Seed: 53 - Train MSE: 0.0047, Valid MSE: 0.1135
+Seed: 67 - Train MSE: 0.0287, Valid MSE: 1.0065
+
+ ==================================================
+
+3. Test te two models on unseen data
+[1.21915202 1.1792638  1.12938472 1.07562446 1.02233979 0.97188153
+ 0.92504734 0.88157362 0.84057754 0.80097584]
+[0.95937671 0.95937011 0.95936099 0.95934952 0.9593358  0.95931976
+ 0.9593018  0.95928333 0.95926642 0.95925292]
+Best model Test MSE: 0.0005
+Worst model Test MSE: 0.0548
+
+ ================================================== 
+
+4. Adding zero-mean Guasian noise to input data
+Var: 0.05, H-Layers: (3, 3), A: 0.001 - T MSE: 0.0120, V MSE: 0.4294, Tst MSE: 0.0094
+Var: 0.05, H-Layers: (3, 3), A: 0.01 - T MSE: 0.0127, V MSE: 0.4509, Tst MSE: 0.0107
+Var: 0.05, H-Layers: (3, 3), A: 0.05 - T MSE: 0.0146, V MSE: 0.4824, Tst MSE: 0.0128
+Var: 0.05, H-Layers: (3, 3), A: 0.1 - T MSE: 0.0159, V MSE: 0.5205, Tst MSE: 0.0151
+Var: 0.05, H-Layers: (3, 6), A: 0.001 - T MSE: 0.0107, V MSE: 0.4718, Tst MSE: 0.0081
+Var: 0.05, H-Layers: (3, 6), A: 0.01 - T MSE: 0.0122, V MSE: 0.4859, Tst MSE: 0.0113
+Var: 0.05, H-Layers: (3, 6), A: 0.05 - T MSE: 0.0140, V MSE: 0.5168, Tst MSE: 0.0129
+Var: 0.05, H-Layers: (3, 6), A: 0.1 - T MSE: 0.0158, V MSE: 0.5598, Tst MSE: 0.0155
+Var: 0.05, H-Layers: (3, 9), A: 0.001 - T MSE: 0.0119, V MSE: 0.4769, Tst MSE: 0.0071
+Var: 0.05, H-Layers: (3, 9), A: 0.01 - T MSE: 0.0122, V MSE: 0.4876, Tst MSE: 0.0088
+Var: 0.05, H-Layers: (3, 9), A: 0.05 - T MSE: 0.0149, V MSE: 0.5376, Tst MSE: 0.0131
+Var: 0.05, H-Layers: (3, 9), A: 0.1 - T MSE: 0.0168, V MSE: 0.5590, Tst MSE: 0.0154
+Var: 0.15, H-Layers: (3, 3), A: 0.001 - T MSE: 0.0168, V MSE: 0.6769, Tst MSE: 0.0182
+Var: 0.15, H-Layers: (3, 3), A: 0.01 - T MSE: 0.0173, V MSE: 0.6841, Tst MSE: 0.0196
+Var: 0.15, H-Layers: (3, 3), A: 0.05 - T MSE: 0.0190, V MSE: 0.7015, Tst MSE: 0.0221
+Var: 0.15, H-Layers: (3, 3), A: 0.1 - T MSE: 0.0201, V MSE: 0.7318, Tst MSE: 0.0246
+Var: 0.15, H-Layers: (3, 6), A: 0.001 - T MSE: 0.0172, V MSE: 0.6724, Tst MSE: 0.0189
+Var: 0.15, H-Layers: (3, 6), A: 0.01 - T MSE: 0.0170, V MSE: 0.6639, Tst MSE: 0.0196
+Var: 0.15, H-Layers: (3, 6), A: 0.05 - T MSE: 0.0185, V MSE: 0.7471, Tst MSE: 0.0229
+Var: 0.15, H-Layers: (3, 6), A: 0.1 - T MSE: 0.0195, V MSE: 0.7133, Tst MSE: 0.0241
+Var: 0.15, H-Layers: (3, 9), A: 0.001 - T MSE: 0.0167, V MSE: 0.6434, Tst MSE: 0.0181
+Var: 0.15, H-Layers: (3, 9), A: 0.01 - T MSE: 0.0173, V MSE: 0.6495, Tst MSE: 0.0193
+Var: 0.15, H-Layers: (3, 9), A: 0.05 - T MSE: 0.0190, V MSE: 0.6642, Tst MSE: 0.0223
+Var: 0.15, H-Layers: (3, 9), A: 0.1 - T MSE: 0.0210, V MSE: 0.7776, Tst MSE: 0.0253
+
+ ==================================================
+
+5. Comparing models with noise
+Fonding best hiden layers number and alpha for noisy data - variance 0.09
+Var: 0.15, H-Layers: (3, 3), A: 0.001 - T MSE: 0.0146, V MSE: 0.5292, Tst MSE: 0.0152
+Var: 0.15, H-Layers: (3, 3), A: 0.005 - T MSE: 0.0151, V MSE: 0.5305, Tst MSE: 0.0161
+Var: 0.15, H-Layers: (3, 3), A: 0.01 - T MSE: 0.0155, V MSE: 0.5337, Tst MSE: 0.0150
+Var: 0.15, H-Layers: (3, 3), A: 0.05 - T MSE: 0.0176, V MSE: 0.5444, Tst MSE: 0.0188
+Var: 0.15, H-Layers: (3, 3), A: 0.1 - T MSE: 0.0191, V MSE: 0.5602, Tst MSE: 0.0214
+Var: 0.15, H-Layers: (3, 6), A: 0.001 - T MSE: 0.0147, V MSE: 0.5916, Tst MSE: 0.0145
+Var: 0.15, H-Layers: (3, 6), A: 0.005 - T MSE: 0.0145, V MSE: 0.6241, Tst MSE: 0.0157
+Var: 0.15, H-Layers: (3, 6), A: 0.01 - T MSE: 0.0150, V MSE: 0.6151, Tst MSE: 0.0159
+Var: 0.15, H-Layers: (3, 6), A: 0.05 - T MSE: 0.0161, V MSE: 0.6106, Tst MSE: 0.0180
+Var: 0.15, H-Layers: (3, 6), A: 0.1 - T MSE: 0.0186, V MSE: 0.7264, Tst MSE: 0.0217
+Var: 0.15, H-Layers: (3, 9), A: 0.001 - T MSE: 0.0147, V MSE: 0.6464, Tst MSE: 0.0186
+Var: 0.15, H-Layers: (3, 9), A: 0.005 - T MSE: 0.0151, V MSE: 0.6535, Tst MSE: 0.0196
+Var: 0.15, H-Layers: (3, 9), A: 0.01 - T MSE: 0.0155, V MSE: 0.6428, Tst MSE: 0.0206
+Var: 0.15, H-Layers: (3, 9), A: 0.05 - T MSE: 0.0172, V MSE: 0.6321, Tst MSE: 0.0190
+Var: 0.15, H-Layers: (3, 9), A: 0.1 - T MSE: 0.0209, V MSE: 0.6597, Tst MSE: 0.0211
+Best Noisy Configuration: (3, 3, 0.001) with Valid MSE: 0.5292
+
+Best Noisy model Test MSE: 0.0152
+==================================================
+
+Train best and worst model form point 2 on nosy data - variance 0.09
+Best 2 model Test MSE on noisy data: 0.0159
+Worst 2 model Test MSE on noisy data: 0.0548
+

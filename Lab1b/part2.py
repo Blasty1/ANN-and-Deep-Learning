@@ -7,7 +7,7 @@ max_iter = 10000
 X, y = data.generate_time_series_data()
 train_X, train_y, valid_X, valid_y, test_X, test_y = data.split_data_for_train_valid_test(X, y)
 
-def train_mlp(train_X, train_y, valid_X, valid_y, alpha, learning_rate, hidden_layers=(7, 5), early_stopping=True, max_iter=10000, random_state=32):
+def train_mlp(train_X, train_y, valid_X, valid_y, alpha, learning_rate, hidden_layers=(7, 5), early_stopping=True, max_iter=10000, random_state=42):
     """
     Trains an MLPRegressor with the given hyperparameters and returns the train and validation MSEs, and the trained model.
     
@@ -29,7 +29,8 @@ def train_mlp(train_X, train_y, valid_X, valid_y, alpha, learning_rate, hidden_l
             early_stopping=early_stopping,
             max_iter=max_iter,
             random_state=random_state,
-            learning_rate_init=learning_rate
+            learning_rate_init=learning_rate,
+            validation_fraction = 0.2
         )
     mlp_reg.fit(train_X, train_y)
     train_pred = mlp_reg.predict(train_X)

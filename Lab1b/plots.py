@@ -147,6 +147,7 @@ def plot_curve_over_epoch(MSEs,title=None,filename=None):
         plt.savefig(save_path)
     plt.show()
 
+
 # Part II
 # Plot mackey-glass time series data
 def plot_mackey_glass_data():

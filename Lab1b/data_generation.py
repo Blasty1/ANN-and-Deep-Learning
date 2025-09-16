@@ -77,7 +77,7 @@ def generate_splited_data(n, percent_of_A = 0.25, percent_of_B = 0.25, task_d = 
     np.random.seed(42)
     if task_d:        
         classA_x2 = np.random.randn(1, n) * sigmaA + mA[1]
-        print(classA_x2)
+
         classA_x2_train = classA_x2[0][: new_n]
         classA_x2_valid = classA_x2[0][new_n :]
         trainA = np.vstack((classA_x1, classA_x2_train))
@@ -104,6 +104,35 @@ def generate_splited_data(n, percent_of_A = 0.25, percent_of_B = 0.25, task_d = 
         valid_B = None
 
     return trainA.T, valid_A.T if valid_A is not None else valid_A, trainB.T, valid_B.T if valid_B is not None else valid_B
+
+def prepare_train_valid_dataset(trainA, trainB, validA=None, validB=None):
+    """
+    It creates the training dataset and the validation data set with the correspondent targets
+    It handles also the cases in which one of the two classes is missing in the validation set
+    It is useful when you have to combine the data obtained by the function generate_splited_data
+    """
+    # Training set
+    X_train = np.hstack([trainA, trainB])
+    targets_train = np.hstack([-np.ones((1, trainA.shape[1])), 
+                              np.ones((1, trainB.shape[1]))])
+    
+    # Validation set
+    X_valid = None
+    targets_valid = None
+    
+    if validA is not None and validB is not None:
+        X_valid = np.hstack([validA, validB])
+        targets_valid = np.hstack([-np.ones((1, validA.shape[1])), 
+                                  np.ones((1, validB.shape[1]))])
+    elif validA is not None:
+        X_valid = validA
+        targets_valid = -np.ones((1, validA.shape[1]))
+    elif validB is not None:
+        X_valid = validB
+        targets_valid = np.ones((1, validB.shape[1]))
+    
+    return X_train, targets_train, X_valid, targets_valid
+
 
 def plot_data(classA, classB, type = 'Splited data'):
     plt.figure(figsize=(10, 8))
@@ -242,3 +271,10 @@ def add_noise(X, variance=0.01):
 #     classA = np.hstack((trainA, validA)) if validA is not None else trainA
 #     classB = np.hstack((trainB, validB)) if validB is not None else trainB
 #     plot_data(trainA, trainB, type='Splited Task d')
+
+
+######## HOW TO USE THE FUNCTIONS ABOVE FOR GENERATING THE DATASETS
+#    trainA, validA, trainB, validB = generate_splited_data(n=100, ...)
+#    X_train, targets_train, X_valid, targets_valid = prepare_train_valid_dataset(
+#     trainA, trainB, validA, validB
+#    )

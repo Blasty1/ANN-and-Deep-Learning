@@ -111,12 +111,6 @@ class RBF_NN:
         
         return (train_mse, validation_mse)
 
-        # Compute the training error
-        y_pred = self.predict(X)
-        train_mse = np.mean((Y-y_pred)**2)
-        
-        return train_mse
-
     def predict(self,X):
         """
         Predict the output of the RBF network

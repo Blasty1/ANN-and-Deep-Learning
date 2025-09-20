@@ -17,6 +17,7 @@ class RBF_NN:
         self.n_hidden = n_hidden
         self.sigma = sigma
         self.centers = centers
+        self.weights = None #! lost weights variable 
     
     def _gaussian_rbf(self, X, centers):
         """
@@ -28,17 +29,36 @@ class RBF_NN:
         rbf_values = np.exp(-(distances**2) / (2 * self.sigma**2))
         
         return rbf_values
+
     
-    # First Stage.( Unsupervised Learning) -> Centers are chosen with unsupervised methods
-    def choose_centers(self, X):
-        pass
+    # First Stage.( Unsupervised Learning  ) -> Centers are chosen with unsupervised methods
+    def choose_centers(self, X, n_iterations = 1000, eta = 0.1):
+        """
+        Unsupervised choosing of centers. 
+        Returns only centers coordinates
+        """
+
+        initaial_coordinates = np.random.choice(X.shape[0], self.n_hidden, replace=False)
+        centers = X[initaial_coordinates].copy()
+    
+        for it in range(n_iterations):
+            shuffled_indices = np.random.permutation(X.shape[0])
+            for i in shuffled_indices:
+                x_i = X[i:i+1]
+                dist_vec = np.sum((centers - x_i)**2, axis=1)
+                
+                win_id = np.argmin(dist_vec)
+                centers[win_id] += eta * (x_i.squeeze() - centers[win_id].squeeze())
+            eta *=0.99
+        self.centers = centers
+        return centers
     
     # Second Stage.( Supervised Learning) -> Output weights are trained using supervised methods
     def fit_least_square(self, X, Y,X_validation, Y_validation):
         """
         Train the RBF network with batch and least squares approach
         """
-        if(self.centers == None):
+        if self.centers is None:    #! change "== None" for "is None" better for arrays 
             # Choose the centers
             self.centers = self.choose_centers(X)
         
@@ -46,9 +66,10 @@ class RBF_NN:
         Phi = self._gaussian_rbf(X, self.centers)
         
         # Add the bias term
-        Phi = np.vstack([Phi, np.ones((1,Phi.shape[1]))])
-        
-        W = np.linalg.pinv(Phi) @ Y.T
+        Phi = np.hstack([Phi, np.ones((Phi.shape[0], 1))]) #! change dimmensions
+        # Phi = np.vstack([Phi, np.ones((1,Phi.shape[1]))]) <-- OLD
+       
+        W = np.linalg.pinv(Phi) @ Y
         
         self.weights = W
     
@@ -78,27 +99,29 @@ class RBF_NN:
         """
         train_mse = []
         validation_mse = []
-        n_samples = X.shape[1]
-        self.weights = self.initialize_weights_random_uniform(Y.shape[0]) if weights is None else weights
+        n_samples = X.shape[0]
+        self.weights = self.initialize_weights_random_uniform(Y.shape[1]) if weights is None else weights
         
         for epoch in range(epochs):
             for i in range(n_samples):
-                x_i = X[: , i:i+1]
-                y_i = Y[:, i:i+1]
+                x_i = X[i:i+1, :] #! change dimensions
+                y_i = Y[i:i+1, :]
                 
                 #compute Phi -> n x N
                 Phi_i = self._gaussian_rbf(x_i, self.centers)
                 
                 # Add the bias term
-                Phi_i = np.vstack([Phi_i, [[1]]])
+                Phi_i_bias = np.hstack([Phi_i, np.ones((Phi_i.shape[0], 1))]) #! change dimensions
+                #Phi_i = np.vstack([Phi_i, [[1]]])<-- OLD
                 
                 # Compute the output
-                y_pred_i = self.weights.T @ Phi_i              # (n_outputs, 1)
+                y_pred_i = Phi_i_bias @ self.weights #! change order of multiplication
+                #y_pred_i = self.weights.T @ Phi_i <-- OLD             # (n_outputs, 1)
                 
                 # compute the error
                 e = y_i - y_pred_i
                 
-                deltaW = learning_rate * Phi_i @ e.T
+                deltaW = learning_rate * Phi_i_bias.T @ e #! change dimensions
                 
                 self.weights += deltaW
 
@@ -108,6 +131,7 @@ class RBF_NN:
             
             y_pred_validation = self.predict(X_validation)
             validation_mse.append(np.mean((Y_validation-y_pred_validation)**2))
+            print(f"Epoch {epoch}: Train MSE {np.mean((Y-y_pred)**2):.5f}, Valid MSE {np.mean((Y_validation-y_pred_validation)**2):.5f}") #! I added print every epoch to mointor MSE
         
         return (train_mse, validation_mse)
 
@@ -115,7 +139,9 @@ class RBF_NN:
         """
         Predict the output of the RBF network
         """
-        Phi = self._gaussian_rbf(X, self.centers)  # (n_hidden, n_samples)
-        Phi = np.vstack([Phi, np.ones((1, Phi.shape[1]))])  # + bias
+        Phi = self._gaussian_rbf(X, self.centers)  # (N_samples, n_hidden)
+        Phi_with_bias = np.hstack([Phi, np.ones((Phi.shape[0], 1))]) #! change dimmensions
+        #Phi = np.vstack([Phi, np.ones((1, Phi.shape[1]))])  # + bias <-- OLD
         
-        return self.weights.T @ Phi   # (n_outputs, n_samples)
+        y_pred = Phi_with_bias @ self.weights
+        return y_pred #self.weights.T @ Phi   # (n_outputs, n_samples)

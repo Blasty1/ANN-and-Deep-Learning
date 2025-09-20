@@ -63,3 +63,18 @@ def plot_prediction(x_train, y_train, x_test, y_pred, fun_name = 'sin(2x)', add_
     save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
     plt.savefig(save_path)
     plt.show()
+
+
+def plot_RBF_kernel_comprision(data):
+    plt.style.use('seaborn-v0_8-whitegrid')
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    for nodes, values in data.items():
+        ax.plot(values['sigma'], values['valid_mse'], 'o-', label=f'{nodes} nodes')
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    ax.set_xlabel('Variance σ', fontsize=14)
+    ax.set_ylabel('Validation MSE', fontsize=14)
+    ax.legend(title='Number of RBF nodes', fontsize=10)
+    ax.grid(True)
+    plt.show()

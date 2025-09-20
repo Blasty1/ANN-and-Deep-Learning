@@ -18,6 +18,9 @@ class RBF_NN:
         self.sigma = sigma
         self.centers = centers
         self.weights = None #! lost weights variable 
+
+    def set_centers(self, centers_vec):
+        self.centers = centers_vec
     
     def _gaussian_rbf(self, X, centers):
         """
@@ -103,9 +106,12 @@ class RBF_NN:
         self.weights = self.initialize_weights_random_uniform(Y.shape[1]) if weights is None else weights
         
         for epoch in range(epochs):
+            shuffled_indices = np.random.permutation(n_samples) #! added shuffle, is required in 3.2
+            X_shuffled = X[shuffled_indices]
+            Y_shuffled = Y[shuffled_indices]
             for i in range(n_samples):
-                x_i = X[i:i+1, :] #! change dimensions
-                y_i = Y[i:i+1, :]
+                x_i = X_shuffled[i:i+1, :] #! change dimensions
+                y_i = Y_shuffled[i:i+1, :]
                 
                 #compute Phi -> n x N
                 Phi_i = self._gaussian_rbf(x_i, self.centers)
@@ -131,7 +137,6 @@ class RBF_NN:
             
             y_pred_validation = self.predict(X_validation)
             validation_mse.append(np.mean((Y_validation-y_pred_validation)**2))
-            print(f"Epoch {epoch}: Train MSE {np.mean((Y-y_pred)**2):.5f}, Valid MSE {np.mean((Y_validation-y_pred_validation)**2):.5f}") #! I added print every epoch to mointor MSE
         
         return (train_mse, validation_mse)
 

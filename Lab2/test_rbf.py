@@ -1,7 +1,7 @@
 # Przykład użycia
-from Plot_functions import *
-from RBF import RBF_NN as rbf
-from Data_generation import *
+from Utils.Plot_functions import *
+from Utils.RBF import RBF_NN as rbf
+from Utils.Data_generation import *
 
 # Choose hyperparamiters
 n_hidden_neurons = 20 # Max 63

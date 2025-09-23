@@ -26,6 +26,14 @@ class RBF_NN:
         """
         Compute Radial-basis function networks
         """
+        
+        # Ensure inputs are 2D
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+            
+        if centers.ndim == 1:
+            centers = centers.reshape(-1, 1)
+        
         distances = cdist(X, centers, metric='euclidean')
 
         # Applica la funzione gaussiana

@@ -43,7 +43,25 @@ def plot_dataset_centers(x_train, y_train, x_test, y_test, centers, fun_name = '
     save_path = os.path.join('Lab2', 'plots', f'Dataset_{noise}{fun_name}_centers.png')
     plt.savefig(save_path)
     plt.show()
-
+    
+def plot_curve(x_value,y_value, x_label, y_label, title, save_name):
+    """
+    Plots a curve given x and y values along with labels and title.
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(x_value, y_value, marker='o')
+    
+    plt.xlabel(x_label, fontsize=14)
+    plt.ylabel(y_label, fontsize=14)
+    plt.title(title, fontsize=16)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(True)
+    
+    save_path = os.path.join('Lab2', 'plots', f'{save_name}.png')
+    plt.savefig(save_path)
+    plt.show()
+    
 def plot_prediction(x_train, y_train, x_test, y_pred, fun_name = 'sin(2x)', add_info = ""):
     """
     Plots sin(2x) or square(2x) prediction.
@@ -63,7 +81,6 @@ def plot_prediction(x_train, y_train, x_test, y_pred, fun_name = 'sin(2x)', add_
     save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
     plt.savefig(save_path)
     plt.show()
-
 
 def plot_RBF_kernel_comprision(data):
     plt.style.use('seaborn-v0_8-whitegrid')

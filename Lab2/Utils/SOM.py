@@ -28,9 +28,9 @@ class SOM:
  
 
     def neighborhood_function(self, distance):
-        tau = max(1, self.total_steps)
-        sigma = self.sigma0 * np.exp(-(self.t)**2 / tau)
-        return np.exp(-(distance**2) / (2 * sigma**2 ))
+        tau = max(1, self.total_steps / np.log((self.sigma0+1e-9) / 0.5))  
+        sigma = max(1e-3, self.sigma0 * np.exp(-self.t / tau))
+        return np.exp(-(distance**2) / (2 * sigma**2))
     
     def grid_distance(self, i, j):  
         ri, ci = divmod(i, self.cols)  # To find the coordiantes of a certain unit in the grid
@@ -60,6 +60,6 @@ class SOM:
                 bmu = self.select_BMU(X[:, i])
                 self.update_weights(X[:, i], bmu)
                 bmus.append(bmu)
-            self.t += 1
+                self.t += 1
             bmu_epoch[epoch+1] = bmus
         return bmu_epoch

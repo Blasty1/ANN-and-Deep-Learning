@@ -32,21 +32,24 @@ class SOM:
         sigma = max(1e-3, self.sigma0 * np.exp(-self.t / tau))
         return np.exp(-(distance**2) / (2 * sigma**2))
     
-    def grid_distance(self, i, j):  
-        ri, ci = divmod(i, self.cols)  # To find the coordiantes of a certain unit in the grid
-        rj, cj = divmod(j, self.cols)
-        return abs(ri-rj) + abs(ci-cj)
-    
+    def grid_distance(self, i, j):
+        if self.grid_dimension == 1:
+            if self.circular:
+                # For circular topology: distance between nodes i and j
+                direct_distance = abs(i - j)
+                wraparound_distance = self.units_number - direct_distance
+                return min(direct_distance, wraparound_distance)
+            else:
+                return abs(i - j)
+        else:
+            # For 2D grid
+            ri, ci = divmod(i, self.cols)
+            rj, cj = divmod(j, self.cols)
+            return abs(ri-rj) + abs(ci-cj)
 
     def update_weights(self, X, bmu):
         for i in range(self.units_number):
-            if self.grid_dimension == 1:
-                if self.circular:
-                    distance = min(abs(bmu - i), self.units_number-abs(bmu-i))
-                else:
-                    distance = abs(bmu - i)
-            else:
-                distance = self.grid_distance(i, bmu)
+            distance = self.grid_distance(i, bmu)  # Use unified grid_distance method
             h = self.neighborhood_function(distance)
             self.W[:, i] += self.lr * h * (X - self.W[:, i])
 

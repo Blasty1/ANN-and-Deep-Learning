@@ -40,7 +40,7 @@ class RBF_NN:
         Unsupervised choosing of centers. 
         Returns only centers coordinates
         """
-
+        np.random.seed(42)
         initaial_coordinates = np.random.choice(X.shape[0], self.n_hidden, replace=False)
         centers = X[initaial_coordinates].copy()
     
@@ -91,6 +91,7 @@ class RBF_NN:
         2. RANDOM UNIFORM [-range, +range]
         Simple but it can cause vanishing/exploding of the gradient
         """
+        np.random.seed(42)
         n_weights = self.n_hidden + 1 ## +1 for the bias
         weights = np.random.uniform(-range_val, range_val, (n_weights, n_outputs))
         return weights
@@ -104,7 +105,8 @@ class RBF_NN:
         validation_mse = []
         n_samples = X.shape[0]
         self.weights = self.initialize_weights_random_uniform(Y.shape[1]) if weights is None else weights
-        
+        np.random.seed(42)
+
         for epoch in range(epochs):
             shuffled_indices = np.random.permutation(n_samples) #! added shuffle, is required in 3.2
             X_shuffled = X[shuffled_indices]

@@ -31,7 +31,8 @@ def generate_data_square_2x():
 def noise_generate_data_sin_2x(variance = 0.1):
     x_train_sin = np.arange(0, 2 * np.pi, 0.1).reshape(-1, 1)
     y_train_sin = np.sin(2 * x_train_sin)
-    
+    np.random.seed(42)
+
     noise_train = np.random.normal(0, np.sqrt(variance), x_train_sin.shape)
     y_train_sin_noisy = y_train_sin + noise_train
     
@@ -50,6 +51,7 @@ def noise_generate_data_sin_2x(variance = 0.1):
 def noise_generate_data_square_2x(variance = 0.1):
     x_train_square = np.arange(0, 2 * np.pi, 0.1).reshape(-1, 1)
     y_train_square = np.where(np.sin(2 * x_train_square) >= 0, 1, -1)
+    np.random.seed(42)
 
     noise_train = np.random.normal(0, np.sqrt(variance), x_train_square.shape)
     y_train_square_noisy = y_train_square + noise_train

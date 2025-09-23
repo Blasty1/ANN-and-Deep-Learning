@@ -18,7 +18,7 @@ class SOM:
     def _init_weights(self):
         sigma = 0.5
         np.random.seed(42)
-        weights = np.random.randn(self.input_dimension, self.units_number) * sigma
+        weights = np.random.rand(self.input_dimension, self.units_number) * sigma
         return weights
 
     def select_BMU(self, X):
@@ -29,10 +29,10 @@ class SOM:
 
     def neighborhood_function(self, distance):
         tau = max(1, self.total_steps)
-        sigma = self.sigma0 * np.exp(-self.t / tau)
+        sigma = self.sigma0 * np.exp(-(self.t)**2 / tau)
         return np.exp(-(distance**2) / (2 * sigma**2 ))
     
-    def grid_distance(self, i, j):
+    def grid_distance(self, i, j):  
         ri, ci = divmod(i, self.cols)  # To find the coordiantes of a certain unit in the grid
         rj, cj = divmod(j, self.cols)
         return abs(ri-rj) + abs(ci-cj)
@@ -53,8 +53,13 @@ class SOM:
     def train(self, X):
         M = X.shape[1]
         self.total_steps = self.epochs * M
+        bmu_epoch ={}
         for epoch in range(self.epochs):
+            bmus = []
             for i in range(M):
                 bmu = self.select_BMU(X[:, i])
                 self.update_weights(X[:, i], bmu)
-                self.t += 1
+                bmus.append(bmu)
+            self.t += 1
+            bmu_epoch[epoch+1] = bmus
+        return bmu_epoch

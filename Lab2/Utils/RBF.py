@@ -26,13 +26,13 @@ class RBF_NN:
         """
         Compute Radial-basis function networks
         """
-        
+
         # Ensure inputs are 2D
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
+        # if X.ndim == 1:
+        #     X = X.reshape(-1, 1)
             
-        if centers.ndim == 1:
-            centers = centers.reshape(-1, 1)
+        # if centers.ndim == 1:
+        #     centers = centers.reshape(-1, 1)
         
         distances = cdist(X, centers, metric='euclidean')
 
@@ -43,7 +43,7 @@ class RBF_NN:
 
     
     # First Stage.( Unsupervised Learning  ) -> Centers are chosen with unsupervised methods
-    def choose_centers(self, X, n_iterations = 1000, eta = 0.1):
+    def choose_centers(self, X, n_iterations = 1000, eta = 0.1, lr_adp = 0.99):
         """
         Unsupervised choosing of centers. 
         Returns only centers coordinates
@@ -63,12 +63,12 @@ class RBF_NN:
                 win_id = np.argmin(dist_vec)
                 win_counts[win_id] += 1
                 centers[win_id] += eta * (x_i.squeeze() - centers[win_id].squeeze())
-            eta *=0.99
+            eta *= lr_adp
         self.centers = centers
         dead_units_indices = np.where(win_counts == 0)[0]
         return centers, dead_units_indices
     
-    def choose_centers_sochastic(self, X, n_iterations=1000, eta=0.1):
+    def choose_centers_sochastic(self, X, n_iterations=1000, eta=0.1, lr_adp = 0.99):
         """
         Unsupervised choosing of centers with a probabilistic update rule
         to prevent dead units.
@@ -99,7 +99,7 @@ class RBF_NN:
                 win_counts[win_id] += 1
                 centers[win_id] += eta * (x_i.squeeze() - centers[win_id].squeeze())
 
-            eta *= 0.99
+            eta *= lr_adp
         
         self.centers = centers
         dead_units_indices = np.where(win_counts == 0)[0]

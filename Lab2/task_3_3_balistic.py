@@ -44,20 +44,25 @@ def plot_data(X, Y, title="Ballistic Data"):
     # Plot input data (angle vs velocity)
     plt.subplot(1, 2, 1)
     plt.scatter(X[:, 0], X[:, 1], alpha=0.7)
-    plt.title(f"{title} - Input Data")
-    plt.xlabel("Angle")
-    plt.ylabel("Velocity")
+    plt.title(f"{title} - Input Data", fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.xlabel("Angle", fontsize=14)
+    plt.ylabel("Velocity", fontsize=14)
     plt.grid(True)
     
     # Plot output data (distance vs height)
     plt.subplot(1, 2, 2)
     plt.scatter(Y[:, 0], Y[:, 1], alpha=0.7, color='orange')
-    plt.title(f"{title} - Output Data")
-    plt.xlabel("Distance")
-    plt.ylabel("Height")
+    plt.title(f"{title} - Output Data", fontsize=14)
+    plt.xlabel("Distance", fontsize=14)
+    plt.ylabel("Height", fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
     plt.grid(True)
-    
+    plt.legend(fontsize=10)
     plt.tight_layout()
+    # plt.savefig(os.path.join('Lab2', 'plots', ''))
     plt.show()
 
 def main():
@@ -71,8 +76,8 @@ def main():
         print("\nData loaded and ready for RBF network training and testing.")
     plot_data(X_train, Y_train, title="Training Data (ballist.dat)")
 
-    n_hidden_vec = [20, 25, 30, 40, 45, 50]
-    sigma_vec= [0.05, 0.1, 0.15, 0.17]
+    n_hidden_vec = [15, 20, 25, 30, 35, 40, 45, 50]
+    sigma_vec= [0.05, 0.1, 0.15]
     epochs = 100
     # n_hidden = 50
     # sigma = 0.1
@@ -83,7 +88,7 @@ def main():
         for sigma in sigma_vec:
 
             rbf_balistic = rbf(n_hidden, sigma)
-            centers, dead_units = rbf_balistic.choose_centers_sochastic(X_train, 300, 0.2)
+            centers, dead_units = rbf_balistic.choose_centers(X_train, 1000, 0.3, 0.95)
             train_mse, valid_mse = rbf_balistic.fit_delta_rule(X_train, Y_train, X_test, Y_test, epochs=epochs, learning_rate=0.05)
             y_pred = rbf_balistic.predict(X_test)
 
@@ -150,38 +155,62 @@ def main():
     plt.figure(figsize=(12, 6))
     plt.plot(list(range(1, epochs+1)), best_combo['train_mse'], color = 'green', label = 'Traning MSE')
     plt.plot(list(range(1, epochs+1)), best_combo['valid_mse'], color = 'red', label = 'Valid MSE')
-    plt.xlabel("Epochs")
-    plt.ylabel("MSE value")
+    plt.xlabel("Epochs", fontsize=14)
+    plt.ylabel("MSE value", fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.legend(fontsize=10, loc='upper right')
     plt.grid(True)
     plt.tight_layout()
+    plt.savefig(os.path.join('Lab2', 'plots', 'Balistic_curve.png'))
     plt.show()
 
 
 
-    plt.figure(figsize=(12, 6))
-
-    ax = plt.subplot(1, 2, 1)
+    plt.figure(figsize=(27, 9))
+    ax = plt.subplot(1, 3, 1)
     for center in best_combo['centers']:
         circle = Circle(center, radius=best_combo['sigma'], color='lime', alpha=0.2, fill=True)
         ax.add_patch(circle)
-    plt.scatter(X_test[:, 0], X_test[:, 1], alpha=0.7)
+    plt.scatter(X_train[:, 0], X_train[:, 1], alpha=0.7)
     plt.scatter(best_combo['centers'][:, 0], best_combo['centers'][:, 1], c='lime', marker='^', s=10, edgecolors='black', label='Centra RBF')
     
-    plt.title(f"Testing - Input Data")
-    plt.xlabel("Angle")
-    plt.ylabel("Velocity")
+    plt.title(f"Trening - Input Data", fontsize=14)
+    plt.xlabel("Angle", fontsize=14)
+    plt.ylabel("Velocity", fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.legend(fontsize=10, loc='upper right')
+    plt.grid(True)
+    
+    ax = plt.subplot(1, 3, 2)
+    for center in best_combo['centers']:
+        circle = Circle(center, radius=best_combo['sigma'], color='lime', alpha=0.2, fill=True)
+        ax.add_patch(circle)
+    plt.scatter(X_test[:, 0], X_test[:, 1], alpha=0.7, label = 'Training data')
+    plt.scatter(best_combo['centers'][:, 0], best_combo['centers'][:, 1], c='lime', marker='^', s=10, edgecolors='black', label='RBF centers')
+    
+    plt.title(f"Testing - Input Data", fontsize=14)
+    plt.xlabel("Angle", fontsize=14)
+    plt.ylabel("Velocity", fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.legend(fontsize=10, loc='upper right')
     plt.grid(True)
     
     # Plot output data (distance vs height)
-    plt.subplot(1, 2, 2)
+    plt.subplot(1, 3, 3)
     plt.scatter(Y_test[:, 0], Y_test[:, 1], alpha=0.7, color='orange')
     plt.scatter(best_combo['prediction'][:, 0], best_combo['prediction'][:, 1], alpha=0.7, color='blue')
-    plt.title(f"Prediction - Output Data")
-    plt.xlabel("Distance")
-    plt.ylabel("Height")
+    plt.title(f"Prediction - Output Data", fontsize=14)
+    plt.xlabel("Distance", fontsize=14)
+    plt.ylabel("Height", fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.legend(fontsize=10, loc='upper right')
     plt.grid(True)
-    
     plt.tight_layout()
+    plt.savefig(os.path.join('Lab2', 'plots', 'Balistic_data_best_model.png'))
     plt.show()
 
 

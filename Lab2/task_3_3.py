@@ -46,7 +46,7 @@ for n_hidden in n_hidden_vec:
     data_noisy_kernels[n_hidden]['model'] = model_vec
     data_noisy_kernels[n_hidden]['time'] = time_vec
 
-plot_RBF_kernel_comprision(data_noisy_kernels)
+# plot_RBF_kernel_comprision(data_noisy_kernels)
 # TODO find best combination for sin
 
 best_combo_noisy = None
@@ -102,7 +102,7 @@ print(f"Nodes: {best_combo_noisy['nodes']}, Sigma: {best_combo_noisy['sigma']:.2
 y_noisy_prediction = best_combo_noisy['model'].predict(X_test_noisy)
 
 
-plot_prediction(X_train_noisy, Y_train_noisy, X_test_noisy, y_noisy_prediction)
+# plot_prediction(X_train_noisy, Y_train_noisy, X_test_noisy, y_noisy_prediction)
 
 
 #!======================================================================
@@ -148,7 +148,7 @@ for n_hidden in n_hidden_vec:
     data_clean_kernels[n_hidden]['model'] = model_vec
     data_clean_kernels[n_hidden]['time'] = time_vec
 
-plot_RBF_kernel_comprision(data_clean_kernels)
+# plot_RBF_kernel_comprision(data_clean_kernels)
 # TODO find best combination for sin
 
 best_combo_clean = None
@@ -201,13 +201,13 @@ print(f"Nodes: {best_combo_clean['nodes']}, Sigma: {best_combo_clean['sigma']:.2
 y_clean_prediction = best_combo_clean['model'].predict(X_test_clean)
 
 
-plot_prediction(X_train_clean, Y_train_clean, X_test_clean, y_clean_prediction )
-
+# plot_prediction(X_train_clean, Y_train_clean, X_test_clean, y_clean_prediction )
+#
 #!======================================================================
 
 print("\n" + "="*50 + "\n")
 
-print('\n==== 1. Compare least square batch and online delta rule ====\n')
+print('\n==== 1. Compare noisy and clean data with CL method ====\n')
 
 #TODO CLEAN DATA WITH CL
 rbf_clean = rbf(n_hidden=best_combo_clean['nodes'], sigma=best_combo_clean['sigma'])
@@ -219,11 +219,13 @@ rbf_noisy = rbf(n_hidden=best_combo_noisy['nodes'], sigma=best_combo_noisy['sigm
 _, dead_units_noisy = rbf_noisy.choose_centers(X_train_noisy, 200, 0.1)
 train_mse_noisy, valid_mse_noisy = rbf_noisy.fit_delta_rule(X_train_noisy, Y_train_noisy, X_test_noisy, Y_test_noisy)
 
-print(f"Clean data --> Train MSE: {train_mse_clean[-1]:.5f}, Valid MSE: {valid_mse_clean[-1]:.5f}, Generalisation gap: {(train_mse_clean[-1]-valid_mse_clean[-1]):.5f}, Nr of dead units: {len(dead_units_clean)}")
-print(f"Noisy data --> Train MSE: {train_mse_noisy[-1]:.5f}, Valid MSE: {valid_mse_noisy[-1]:.5f}, Generalisation gap: {(train_mse_noisy[-1]-valid_mse_noisy[-1]):.5f}, Nr of dead units: {len(dead_units_noisy)}")
-
 y_clean_prediction = rbf_clean.predict(X_test_clean)
 y_noisy_prediction = rbf_noisy.predict(X_test_noisy)
+
+print(f"Clean data --> Train MSE: {train_mse_clean[-1]:.5f}, Valid MSE: {valid_mse_clean[-1]:.5f}, Gap: {(train_mse_clean[-1]-valid_mse_clean[-1]):.5f}, MAE: {np.mean(np.abs(Y_test_clean - y_clean_prediction))} Nr of dead units: {len(dead_units_clean)}")
+print(f"Noisy data --> Train MSE: {train_mse_noisy[-1]:.5f}, Valid MSE: {valid_mse_noisy[-1]:.5f}, Gap: {(train_mse_noisy[-1]-valid_mse_noisy[-1]):.5f}, MAE: {np.mean(np.abs(Y_test_clean - y_noisy_prediction))} Nr of dead units: {len(dead_units_noisy)}")
+
+
 
 
 plt.figure(figsize=(10, 6))
@@ -237,8 +239,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Compere_prediction_CL_noisy_clean_sin2x.png')
+plt.savefig(save_path)
 plt.show()
 
  
@@ -248,7 +250,7 @@ print("\n" + "="*50 + "\n")
 
 print('\n==== 2. Dead units prevention ====\n')
 
-X_train_du, Y_train_du, X_test_du, Y_test_du = create_clustered_data_for_dead_units()
+# X_train_du, Y_train_du, X_test_du, Y_test_du = create_clustered_data_for_dead_units()
 
 rbf_soch = rbf(n_hidden=35, sigma=0.5)
 _, dead_units_soch = rbf_soch.choose_centers_sochastic(X_train_noisy, 200, 0.1)
@@ -258,15 +260,15 @@ rbf_wta = rbf(n_hidden=35, sigma=0.5)
 _, dead_units_wta = rbf_wta.choose_centers(X_train_noisy, 200, 0.1)
 train_mse_wta, valid_mse_wta = rbf_wta.fit_delta_rule(X_train_noisy, Y_train_noisy, X_test_noisy, Y_test_noisy)
 
-print(f"Sochastic centers --> Train MSE: {train_mse_soch[-1]:.5f}, Valid MSE: {valid_mse_soch[-1]:.5f}, Generalisation gap: {(train_mse_soch[-1]-valid_mse_soch[-1]):.5f}, Nr of dead units: {len(dead_units_soch)}")
-print(f"WTA centers --> Train MSE: {train_mse_wta[-1]:.5f}, Valid MSE: {valid_mse_wta[-1]:.5f}, Generalisation gap: {(train_mse_wta[-1]-valid_mse_wta[-1]):.5f}, Nr of dead units: {len(dead_units_wta)}")
+print(f"Sochastic centers noisy--> Train MSE: {train_mse_soch[-1]:.5f}, Valid MSE: {valid_mse_soch[-1]:.5f}, Generalisation gap: {(train_mse_soch[-1]-valid_mse_soch[-1]):.5f}, Nr of dead units: {len(dead_units_soch)}")
+print(f"WTA centers noisy--> Train MSE: {train_mse_wta[-1]:.5f}, Valid MSE: {valid_mse_wta[-1]:.5f}, Generalisation gap: {(train_mse_wta[-1]-valid_mse_wta[-1]):.5f}, Nr of dead units: {len(dead_units_wta)}")
 
 y_pred_soch = rbf_soch.predict(X_test_noisy)
 
 y_pred_wta = rbf_wta.predict(X_test_noisy)
 
 plt.figure(figsize=(10, 6))
-plt.plot(X_test_noisy, Y_test_noisy, color='blue', linestyle = 'dashed', label=f'Clean data')
+plt.plot(X_test_clean, Y_test_clean, color='blue', linestyle = 'dashed', label=f'Clean data')
 plt.plot(X_test_noisy, y_pred_wta, color='red', label=f'WTA prediction')
 plt.plot(X_test_noisy, y_pred_soch, color='green', label=f'Sochastic prediction')
 
@@ -276,8 +278,39 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Prediction_sochastic_normal_CL.png')
+plt.savefig(save_path)
 plt.show()
 
+#!==============================================
+
+rbf_soch = rbf(n_hidden=50, sigma=0.3)
+_, dead_units_soch = rbf_soch.choose_centers_sochastic(X_train_clean, 200, 0.1)
+train_mse_soch, valid_mse_soch = rbf_soch.fit_delta_rule(X_train_clean, Y_train_clean, X_test_clean, Y_test_clean)
+
+rbf_wta = rbf(n_hidden=50, sigma=0.3)
+_, dead_units_wta = rbf_wta.choose_centers(X_train_clean, 200, 0.1)
+train_mse_wta, valid_mse_wta = rbf_wta.fit_delta_rule(X_train_clean, Y_train_clean, X_test_clean, Y_test_clean)
+
+print(f"Sochastic centers clean--> Train MSE: {train_mse_soch[-1]:.5f}, Valid MSE: {valid_mse_soch[-1]:.5f}, Generalisation gap: {(train_mse_soch[-1]-valid_mse_soch[-1]):.5f}, Nr of dead units: {len(dead_units_soch)}")
+print(f"WTA centers clean --> Train MSE: {train_mse_wta[-1]:.5f}, Valid MSE: {valid_mse_wta[-1]:.5f}, Generalisation gap: {(train_mse_wta[-1]-valid_mse_wta[-1]):.5f}, Nr of dead units: {len(dead_units_wta)}")
+
+y_pred_soch = rbf_soch.predict(X_test_clean)
+
+y_pred_wta = rbf_wta.predict(X_test_clean)
+
+plt.figure(figsize=(10, 6))
+plt.plot(X_test_clean, Y_test_clean, color='blue', linestyle = 'dashed', label=f'Clean data')
+plt.plot(X_test_clean, y_pred_wta, color='red', label=f'WTA prediction')
+plt.plot(X_test_clean, y_pred_soch, color='green', label=f'Sochastic prediction')
+
+plt.xlabel('X', fontsize=14)
+plt.ylabel('y', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=10, loc='upper right')
+plt.grid(True)
+save_path = os.path.join('Lab2', 'plots', f'Prediction_sochastic_normal_CL_clean.png')
+plt.savefig(save_path)
+plt.show()
 

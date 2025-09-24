@@ -49,7 +49,7 @@ for n_hidden in n_hidden_vec:
     data_sin_kernels[n_hidden]['model'] = model_vec
     data_sin_kernels[n_hidden]['time'] = time_vec
 
-plot_RBF_kernel_comprision(data_sin_kernels)
+plot_RBF_kernel_comprision(data_sin_kernels, 'sin2x_deltarule_noisy')
 # TODO find best combination for sin
 
 best_combo = None
@@ -106,7 +106,18 @@ y_best_prediction = best_combo['model'].predict(X_test_sin)
 
 
 plot_prediction(X_train_sin, Y_train_sin, X_test_sin, y_best_prediction )
-
+plt.figure(figsize=(10, 6))
+plt.scatter(X_train_sin, Y_train_sin, s=10, label=f'Training data')
+plt.plot(X_test_sin, y_best_prediction, color='red', label=f'Prediction of sin(2x)')
+plt.xlabel('X', fontsize=14)
+plt.ylabel('y', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=10, loc='upper right')
+plt.grid(True)
+save_path = os.path.join('Lab2', 'plots', f'Prediction_best_model_sin2x_delta_rule_noisy.png')
+plt.savefig(save_path)
+plt.show()
 
 #! NEWSECTION ======================================================================
 
@@ -132,10 +143,11 @@ data_least_quare['valid_mse'] = valid_mse
 data_least_quare['genralisation_gap'] = gen_gap
 data_least_quare['model'] = rbf_net
 
-print(f"Delta rule --> Train MSE: {best_combo['train_mse']:.4f}, Valid MSE: {best_combo['valid_mse']:.4f}")
-print(f"Lest square --> Train MSE: {data_least_quare['train_mse']:.4f}, Valid MSE: {data_least_quare['valid_mse']:.4f}")
-
 y_predict_least_square = data_least_quare['model'].predict(X_test_sin)
+
+print(f"Delta rule --> Train MSE: {best_combo['train_mse']:.4f}, Valid MSE: {best_combo['valid_mse']:.4f},Gap: {best_combo['generalization_gap']:.4f} MAE: {np.mean(np.abs(Y_test_sin -y_best_prediction))}")
+print(f"Lest square --> Train MSE: {data_least_quare['train_mse']:.4f}, Valid MSE: {data_least_quare['valid_mse']:.4f}, Gap: {data_least_quare['genralisation_gap']} MAE: {np.mean(np.abs(Y_test_sin -y_predict_least_square))}")
+
 
 # TODO compare with plotting
 plt.figure(figsize=(10, 6))
@@ -149,8 +161,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Compere_prediction_sin2x_delta_leastsq_noisy.png')
+plt.savefig(save_path)
 plt.show()
 
 
@@ -171,7 +183,7 @@ for eta in eta_vec:
         rbf_net.set_centers(centers)
         train_mse, valid_mse = rbf_net.fit_delta_rule(X_train_sin, Y_train_sin, X_test_sin, Y_test_sin, learning_rate=eta)
         gen_gap = train_mse[-1] - valid_mse[-1]
-        print(f"{n_hidden} hidden nodes, sigma {sigma}, train MSE: {train_mse[-1]:.5f}, valid MSE: {valid_mse[-1]:.5f}, gap: {(train_mse[-1] - valid_mse[-1]):.5f}")
+        print(f"{best_combo['nodes']} hidden nodes, sigma {best_combo['sigma']}, train MSE: {train_mse[-1]:.5f}, valid MSE: {valid_mse[-1]:.5f}, gap: {(train_mse[-1] - valid_mse[-1]):.5f}")
         data_choose_eta[eta]['train_mse'] = train_mse
         data_choose_eta[eta]['valid_mse'] = valid_mse
         data_choose_eta[eta]['genralisation_gap'] = gen_gap
@@ -188,6 +200,7 @@ ax.set_xlabel('Epochs', fontsize=14)
 ax.set_ylabel('Validation MSE', fontsize=14)
 ax.legend(title='Lerinig rate value', fontsize=10)
 ax.grid(True)
+plt.savefig(os.path.join('Lab2', 'plots', 'Compere_learning_rates_sin2x_delta_rule_noisy.png'))
 plt.show()
 
 
@@ -214,14 +227,14 @@ rbf_net = rbf(n_hidden=best_combo['nodes'], sigma=best_combo['sigma'])
 rbf_net.set_centers(random_centers)
 train_mse, valid_mse = rbf_net.fit_delta_rule(X_train_sin, Y_train_sin, X_test_sin, Y_test_sin)
 gen_gap = train_mse[-1] - valid_mse[-1]
-print(f"{n_hidden} hidden nodes, sigma {sigma}, train MSE: {train_mse[-1]:.5f}, valid MSE: {valid_mse[-1]:.5f}, gap: {(train_mse[-1] - valid_mse[-1]):.5f}")
+print(f"{best_combo['nodes']} hidden nodes, sigma {best_combo['sigma']}, Train MSE: {train_mse[-1]:.5f}, Valid MSE: {valid_mse[-1]:.5f}, Gap: {(train_mse[-1] - valid_mse[-1]):.5f}")
 data_random_centers['train_mse'] = train_mse
 data_random_centers['valid_mse'] = valid_mse
 data_random_centers['genralisation_gap'] = gen_gap
 data_random_centers['model'] = rbf_net
 
 y_predict_random_centers = data_random_centers['model'].predict(X_test_sin)
-y_predict_my_centers =  data_choose_eta[0.01]['model'].predict(X_test_sin)
+y_predict_my_centers =  best_combo['model'].predict(X_test_sin)
 
 plt.figure(figsize=(10, 6))
 plt.scatter(X_train_sin, Y_train_sin, s=10, label=f'Training data')
@@ -234,8 +247,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Comper_prediction_random_centers_my_centers_sin2x_deltarule_noisy.png')
+plt.savefig(save_path)
 plt.show()
 
 
@@ -264,8 +277,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Prediction_noisy_sin2x_model_clean_data.png')
+plt.savefig(save_path)
 plt.show()
 
 
@@ -303,6 +316,6 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Compere_prediction_MLP_RBF_sin2x_noisy.png')
+plt.savefig(save_path)
 plt.show()

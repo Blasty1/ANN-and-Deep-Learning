@@ -50,7 +50,7 @@ for n_hidden in n_hidden_vec:
     data_sqr_kernels[n_hidden]['model'] = model_vec
     data_sqr_kernels[n_hidden]['time'] = time_vec
 
-plot_RBF_kernel_comprision(data_sqr_kernels)
+plot_RBF_kernel_comprision(data_sqr_kernels, "_squere2x_deltarule_noisy")
 # TODO find best combination for square
 
 best_combo = None
@@ -109,6 +109,18 @@ y_best_prediction = best_combo['model'].predict(X_test_sqr)
 
 
 plot_prediction(X_train_sqr, Y_train_sqr, X_test_sqr, y_best_prediction )
+plt.figure(figsize=(10, 6))
+plt.scatter(X_train_sqr, Y_train_sqr, s=10, label=f'Training data')
+plt.plot(X_test_sqr, y_best_prediction, color='red', label=f'Prediction of square(2x)')
+plt.xlabel('X', fontsize=14)
+plt.ylabel('y', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(fontsize=10, loc='upper right')
+plt.grid(True)
+save_path = os.path.join('Lab2', 'plots', f'Prediction_best_model_square2x_delta_rule_noisy.png')
+plt.savefig(save_path)
+plt.show()
 
 
 #! NEWSECTION ======================================================================
@@ -133,11 +145,11 @@ data_least_quare['train_mse'] = train_mse
 data_least_quare['valid_mse'] = valid_mse
 data_least_quare['genralisation_gap'] = gen_gap
 data_least_quare['model'] = rbf_net
-
-print(f"Delta rule --> Train MSE: {best_combo['train_mse']:.4f}, Valid MSE: {best_combo['valid_mse']:.4f}")
-print(f"Lest square --> Train MSE: {data_least_quare['train_mse']:.4f}, Valid MSE: {data_least_quare['valid_mse']:.4f}")
-
 y_predict_least_square = data_least_quare['model'].predict(X_test_sqr)
+
+print(f"Delta rule --> Train MSE: {best_combo['train_mse']:.4f}, Valid MSE: {best_combo['valid_mse']:.4f}, Gap: {best_combo['generalization_gap']:.4f} MAE: {np.mean(np.abs(Y_test_sqr -y_best_prediction))}")
+print(f"Lest square --> Train MSE: {data_least_quare['train_mse']:.4f}, Valid MSE: {data_least_quare['valid_mse']:.4f},Gap: {data_least_quare['genralisation_gap']} MAE: {np.mean(np.abs(Y_test_sqr -y_predict_least_square))}")
+
 
 # TODO compare with plotting
 plt.figure(figsize=(10, 6))
@@ -151,8 +163,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Compere_prediction_square2x_deltarule_leasrsq_noisy.png')
+plt.savefig(save_path)
 plt.show()
 
 
@@ -190,6 +202,7 @@ ax.set_xlabel('Epochs', fontsize=14)
 ax.set_ylabel('Validation MSE', fontsize=14)
 ax.legend(title='Lerinig rate value', fontsize=10)
 ax.grid(True)
+plt.savefig(os.path.join('Lab2', 'plots', 'Compere_learning_rates_square2x_delta_rule_noisy.png'))
 plt.show()
 
 
@@ -238,8 +251,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Comper_prediction_random_centers_my_centers_square2x_deltarule_noisy.png')
+plt.savefig(save_path)
 plt.show()
 
 
@@ -269,8 +282,8 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Prediction_noisy_square2x_model_clean_data.png')
+plt.savefig(save_path)
 plt.show()
 
 
@@ -308,6 +321,6 @@ plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(fontsize=10, loc='upper right')
 plt.grid(True)
-# save_path = os.path.join('Lab2', 'plots', f'Prediction_{fun_name}{add_info}.png')
-# plt.savefig(save_path)
+save_path = os.path.join('Lab2', 'plots', f'Compere_prediction_MLP_RBF_square2x_noisy.png')
+plt.savefig(save_path)
 plt.show()

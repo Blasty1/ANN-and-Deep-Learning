@@ -40,10 +40,12 @@ class RBF_NN:
         Unsupervised choosing of centers. 
         Returns only centers coordinates
         """
-        np.random.seed(42)
-        initaial_coordinates = np.random.choice(X.shape[0], self.n_hidden, replace=False)
-        centers = X[initaial_coordinates].copy()
-    
+        # np.random.seed(42)
+        # initaial_coordinates = np.random.choice(X.shape[0], self.n_hidden, replace=False)
+        centers = np.random.uniform(low=np.min(X), high=np.max(X), size=(self.n_hidden, X.shape[1]))
+        # centers = X[initaial_coordinates].copy()
+        win_counts = np.zeros(self.n_hidden, dtype=int)
+
         for it in range(n_iterations):
             shuffled_indices = np.random.permutation(X.shape[0])
             for i in shuffled_indices:
@@ -51,11 +53,51 @@ class RBF_NN:
                 dist_vec = np.sum((centers - x_i)**2, axis=1)
                 
                 win_id = np.argmin(dist_vec)
+                win_counts[win_id] += 1
                 centers[win_id] += eta * (x_i.squeeze() - centers[win_id].squeeze())
             eta *=0.99
         self.centers = centers
-        return centers
+        dead_units_indices = np.where(win_counts == 0)[0]
+        return centers, dead_units_indices
     
+    def choose_centers_sochastic(self, X, n_iterations=1000, eta=0.1):
+        """
+        Unsupervised choosing of centers with a probabilistic update rule
+        to prevent dead units.
+        Returns centers coordinates and a list of dead unit indices.
+        """
+        np.random.seed(42)
+        centers = np.random.uniform(low=np.min(X), high=np.max(X), size=(self.n_hidden, X.shape[1]))
+        win_counts = np.zeros(self.n_hidden, dtype=int)
+
+        prob_closest = 0.80
+        
+        for it in range(n_iterations):
+            shuffled_indices = np.random.permutation(X.shape[0])
+            for i in shuffled_indices:
+                x_i = X[i:i+1]
+                dist_vec = np.sum((centers - x_i)**2, axis=1)
+
+                closest_nodes_indices = np.argsort(dist_vec)[:2]
+
+                if np.random.rand() < prob_closest:
+                    win_id = closest_nodes_indices[0]  
+                else:
+                    if len(closest_nodes_indices) > 1:
+                        win_id = closest_nodes_indices[1]
+                    else:
+                        win_id = closest_nodes_indices[0]
+
+                win_counts[win_id] += 1
+                centers[win_id] += eta * (x_i.squeeze() - centers[win_id].squeeze())
+
+            eta *= 0.99
+        
+        self.centers = centers
+        dead_units_indices = np.where(win_counts == 0)[0]
+
+        return centers, dead_units_indices
+        
     # Second Stage.( Supervised Learning) -> Output weights are trained using supervised methods
     def fit_least_square(self, X, Y,X_validation, Y_validation):
         """
@@ -149,6 +191,5 @@ class RBF_NN:
         Phi = self._gaussian_rbf(X, self.centers)  # (N_samples, n_hidden)
         Phi_with_bias = np.hstack([Phi, np.ones((Phi.shape[0], 1))]) #! change dimmensions
         #Phi = np.vstack([Phi, np.ones((1, Phi.shape[1]))])  # + bias <-- OLD
-        
         y_pred = Phi_with_bias @ self.weights
         return y_pred #self.weights.T @ Phi   # (n_outputs, n_samples)

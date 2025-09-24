@@ -173,7 +173,7 @@ def main():
         circle = Circle(center, radius=best_combo['sigma'], color='lime', alpha=0.2, fill=True)
         ax.add_patch(circle)
     plt.scatter(X_train[:, 0], X_train[:, 1], alpha=0.7)
-    plt.scatter(best_combo['centers'][:, 0], best_combo['centers'][:, 1], c='lime', marker='^', s=10, edgecolors='black', label='Centra RBF')
+    plt.scatter(best_combo['centers'][:, 0], best_combo['centers'][:, 1], c='lime', marker='^', s=40, edgecolors='black', label='Centra RBF')
     
     plt.title(f"Trening - Input Data", fontsize=14)
     plt.xlabel("Angle", fontsize=14)
@@ -188,7 +188,7 @@ def main():
         circle = Circle(center, radius=best_combo['sigma'], color='lime', alpha=0.2, fill=True)
         ax.add_patch(circle)
     plt.scatter(X_test[:, 0], X_test[:, 1], alpha=0.7, label = 'Training data')
-    plt.scatter(best_combo['centers'][:, 0], best_combo['centers'][:, 1], c='lime', marker='^', s=10, edgecolors='black', label='RBF centers')
+    plt.scatter(best_combo['centers'][:, 0], best_combo['centers'][:, 1], c='lime', marker='^', s=40, edgecolors='black', label='RBF centers')
     
     plt.title(f"Testing - Input Data", fontsize=14)
     plt.xlabel("Angle", fontsize=14)

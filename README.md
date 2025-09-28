@@ -15,14 +15,11 @@ Rules:
 - Write the answer to the questions and comments into the group chat by quoting the question/task related
 
 Tasks:
-- Part 1
-    - 3.1 Batch mode training using least squares - supervised learning of network weights -> Bruno
-    - 3.2 Regression with noise -> Zuzanna
-    - 3.3 CL to initialise RBF units -> Zuzanna
-- Part 2
-    - 4.1 Topological Ordering Of Animale Species -> Fatima
-        -  Write the SOM algorithm
-    - 4.2 Cyclic Tour -> Bruno
-    - 4.3 Votes of MPs -> Fatima
-- Report -> Zuzanna, Fatima
-- Presentation -> Bruno
+- Write the code of Hopfield Network -> Bruno
+- 3.1 Convergence and attractors -> Bruno
+- 3.2 Sequential update -> Bruno
+- 3.3 Energy -> implement the energy code -> Fatima
+- 3.4 Distortion resistance -> try the code with a lot of noises  -> Zuzanna
+- 3.5 Capacity -> Fatima
+    - Big point
+- 3.6 Sparse Patterns -> write code for binary coding of the patterns and update -> Zuzanna

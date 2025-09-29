@@ -74,7 +74,7 @@ def add_noise(pattern, percent = 0.01):
     """
     noisy_pattern = pattern.copy()
     size = int(len(noisy_pattern)*percent)
-    fllip_idx = np.random.choice(noisy_pattern, size = size, replace=False)
+    fllip_idx = np.random.choice(len(noisy_pattern), size = size, replace=False)
     noisy_pattern[fllip_idx] *= -1
     return noisy_pattern
 

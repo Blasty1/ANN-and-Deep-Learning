@@ -102,9 +102,9 @@ def data_small_model():
     x1, x2, x3 -> np.arrays (8, ) 
 
     """
-    x1 = np.array(-1,  -1,  1,  -1,  1,  -1,  -1,  1)
-    x2 = np.array(-1,  -1,  -1,  -1,  -1,  1,  -1,  -1)
-    x3 = np.array(-1,  1,  1,  -1,  -1,  1,  -1,  1)
+    x1 = np.array([-1,  -1,  1,  -1,  1,  -1,  -1,  1])
+    x2 = np.array([-1,  -1,  -1,  -1,  -1,  1,  -1,  -1])
+    x3 = np.array([-1,  1,  1,  -1,  -1,  1,  -1,  1])
     return x1, x2, x3
 
 
@@ -115,8 +115,8 @@ def data_small_model_new():
     x1d, x2d, x3d -> np.arrays (8, ) 
     
     """
-    x1d = np.array( 1,  -1,  1,  -1,  1,  -1,  -1,  1)
-    x2d = np.array( 1,  1,  -1,  -1,  -1,  1,  -1,  -1)
-    x3d = np.array(1,  1,  1,  -1,  1,  1,  -1,  1)
+    x1d = np.array([1,  -1,  1,  -1,  1,  -1,  -1,  1])
+    x2d = np.array([1,  1,  -1,  -1,  -1,  1,  -1,  -1])
+    x3d = np.array([1,  1,  1,  -1,  1,  1,  -1,  1])
     return x1d, x2d, x3d 
 

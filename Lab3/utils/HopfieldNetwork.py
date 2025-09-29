@@ -25,17 +25,17 @@ class HopfieldNetwork:
         for p in patterns:
             p = p.reshape(-1,1)
             self.weights += np.dot(p,p.T)
-            
-        if(self_connections==False):
-            np.fill_diagonal(self.weights,0) # No self-connections
         
         self.weights /= len(patterns)
+        
+        if(self_connections==False):
+            np.fill_diagonal(self.weights,0) # No self-connections
     
     ## little_model
     def recall_synchronously(self,pattern,max_iterations=100,bipolar_coding=True):
         state = pattern.copy()
         for _ in range(max_iterations):
-            new_state 
+            new_state = state.copy()
             if bipolar_coding:
                 new_state = np.sign(np.dot(self.weights,state))
                 new_state[new_state==0] = 1 # Handle zero case

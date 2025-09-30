@@ -1,3 +1,4 @@
+from read_generate_data import show_pattern
 import numpy as np
 class HopfieldNetwork:
     def __init__(self,num_neurons):
@@ -53,7 +54,7 @@ class HopfieldNetwork:
         state = pattern.copy()
         indices = np.arange(self.num_neurons)
             
-        for _ in range(max_iterations):
+        for iteration in range(max_iterations):
             if random_order:
                 indices = np.random.permutation(self.num_neurons)
 
@@ -64,7 +65,10 @@ class HopfieldNetwork:
                     state[i] = 1 if net_input >= 0 else -1
                 else:
                     state[i] = 1 if net_input >= 0 else 0
-            
+                    
+            if random_order and iteration%100 == 0:
+                show_pattern(state,f"Result at {iteration}th iteration")
+                
             if np.array_equal(state,prev_state):
                 #convergence reached
                 return state
@@ -87,6 +91,24 @@ class HopfieldNetwork:
         else:
             return self.recall_asynchronously(pattern,max_iterations,random_order,bipolar_coding)
     
+    def find_all_attractors(hopfield_net, num_random_tests=5000):
+        """
+        Systematically search for attractors by testing many patterns.
+        An attractor is a stable state - a pattern that doesn't change when recalled.
+        """
+        
+        attractor_set = set()
+        # Test many random patterns
+        np.random.seed(42)
+        
+        for _ in range(num_random_tests):
+            random_pattern = np.random.choice([-1, 1], size=8)
+            result = hopfield_net.recall(random_pattern)
+            attractor_set.add(tuple(result))
+        
+        # Convert to list
+        attractors = [np.array(attr) for attr in attractor_set]
+        return attractors
 
     # for future tasks
     def add_noise(self,pattern,noise_level):

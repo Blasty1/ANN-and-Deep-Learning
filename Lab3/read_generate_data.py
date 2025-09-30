@@ -30,7 +30,7 @@ def read_patterns(data_file_path = os.path.join('Lab3', 'data', 'pict.dat')):
                 i = 0
     return np.array(patterns)
 
-def show_pattern(pattern_array): 
+def show_pattern(pattern_array, title, notShow=False ): 
     """ 
     Visualize pattern(array)
 
@@ -42,8 +42,12 @@ def show_pattern(pattern_array):
     pattern_array = pattern_array.reshape((side, side))
     plt.figure(figsize=(3, 3))
     plt.imshow(pattern_array)
+    plt.title(title)
     plt.axis('off')
-    plt.show()
+    if not notShow:
+        plt.show()
+    else:
+        return plt
 
 def show_multiple_arrays(pattern_array):
     """ 

@@ -113,3 +113,41 @@ class HopfieldNetwork:
     # for future tasks
     def add_noise(self,pattern,noise_level):
         pass
+
+
+    def train_sparse(self,patterns,self_connections=False):
+    
+        N = self.num_neurons
+        rho = np.mean(patterns)
+        self.weights = np.zeros((N, N))
+        for p in patterns:
+            p_centered = p - rho
+            p_centered = p_centered.reshape(-1, 1)
+            self.weights += np.dot(p_centered, p_centered.T)
+                
+        if(self_connections==False):
+                np.fill_diagonal(self.weights, 0) 
+    
+
+    def recall_sparse(self, pattern, theta, max_iterations=100, random_order=True):
+
+        state = pattern.copy()
+        indices = np.arange(self.num_neurons)
+        
+        for _ in range(max_iterations):
+            if random_order:
+                indices = np.random.permutation(self.num_neurons)
+
+            prev_state = state.copy()
+            for i in indices:
+                net_input = np.dot(self.weights[i], state)
+
+                if (net_input - theta) >= 0:
+                    state[i] = 1
+                else:
+                    state[i] = 0
+            
+            if np.array_equal(state, prev_state):
+                return state
+                
+        return state

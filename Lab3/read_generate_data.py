@@ -30,7 +30,7 @@ def read_patterns(data_file_path = os.path.join('Lab3', 'data', 'pict.dat')):
                 i = 0
     return np.array(patterns)
 
-def show_pattern(pattern_array, title, notShow=False ): 
+def show_pattern(pattern_array, title, notShow=False, isTitle = True): 
     """ 
     Visualize pattern(array)
 
@@ -42,14 +42,15 @@ def show_pattern(pattern_array, title, notShow=False ):
     pattern_array = pattern_array.reshape((side, side))
     plt.figure(figsize=(3, 3))
     plt.imshow(pattern_array)
-    plt.title(title)
+    if isTitle:
+        plt.title(title)
     plt.axis('off')
     if not notShow:
         plt.show()
     else:
         return plt
 
-def show_multiple_arrays(pattern_array):
+def show_multiple_arrays(pattern_array, save_name = None):
     """ 
     Visualize all patterns(array)
 
@@ -63,6 +64,9 @@ def show_multiple_arrays(pattern_array):
         plt.subplot(1, len(pattern_array), i+1)
         plt.imshow(pattern_array[i].reshape((side, side)))
         plt.axis('off')
+    if save_name != None:
+        plt.tight_layout()
+        plt.savefig(os.path.join('Lab3', 'plots_data', save_name))
     plt.show()
 
 def add_noise(pattern, percent = 0.01):

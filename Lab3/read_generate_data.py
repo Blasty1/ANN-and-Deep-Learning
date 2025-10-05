@@ -61,8 +61,9 @@ def show_multiple_arrays(pattern_array, save_name = None):
     fig = plt.figure(figsize=(10, 3))
     for i in range(len(pattern_array)):
         side = int(np.sqrt(pattern_array[i].shape[0]))
-        plt.subplot(1, len(pattern_array), i+1)
+        plt.subplot(2, 6, i+1)
         plt.imshow(pattern_array[i].reshape((side, side)))
+        plt.title(f'p{i+1}')
         plt.axis('off')
     if save_name != None:
         plt.tight_layout()
@@ -128,3 +129,5 @@ def data_small_model_new():
     x3d = np.array([1,  1,  1,  -1,  1,  1,  -1,  1])
     return x1d, x2d, x3d 
 
+p= read_patterns()
+show_multiple_arrays(p, 'all_data.png')

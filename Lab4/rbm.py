@@ -84,8 +84,13 @@ class RestrictedBoltzmannMachine():
 	    # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
             # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
+            p_h_given_v , h0 = self.get_h_given_v(visible_trainset) # v_0 -> h_0
+            p_v_given_h , v1 = self.get_v_given_h(h0) # h_0 -> v_1
+                       
+            p_h_given_v_recon, h1 = self.get_h_given_v(v1) # v_1 -> h_1
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
+            self.update_params(visible_trainset,h0,v1,h1)
             
             # visualize once in a while when visible layer is input images
             
@@ -117,14 +122,15 @@ class RestrictedBoltzmannMachine():
         """
 
         # [TODO TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
+        batch_size = v_0.shape[0]
         
-        self.delta_bias_v += 0
-        self.delta_weight_vh += 0
-        self.delta_bias_h += 0
+        self.delta_bias_v += np.sum(v_0 - v_k, axis=0) / batch_size
+        self.delta_weight_vh += (v_0.T @ h_0 - v_k.T @ h_k)/batch_size
+        self.delta_bias_h += np.sum(h_0 - h_k, axis=0) / batch_size
         
-        self.bias_v += self.delta_bias_v
-        self.weight_vh += self.delta_weight_vh
-        self.bias_h += self.delta_bias_h
+        self.bias_v += self.learning_rate * self.delta_bias_v 
+        self.weight_vh += self.learning_rate *  self.delta_weight_vh
+        self.bias_h += self.learning_rate *  self.delta_bias_h
         
         return
 
@@ -146,8 +152,17 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below) 
+        support = self.bias_h + visible_minibatch @ self.weight_vh
+
+        #P(H|V)
+        p_h_given_v_value = sigmoid(support)
         
-        return np.zeros((n_samples,self.ndim_hidden)), np.zeros((n_samples,self.ndim_hidden))
+        #activations h
+        #samples from a Bernoulli distribution
+        h_sample = sample_binary(p_h_given_v_value)
+
+        
+        return p_h_given_v_value, h_sample
 
 
     def get_v_given_h(self,hidden_minibatch):
@@ -179,16 +194,40 @@ class RestrictedBoltzmannMachine():
             # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass below). \
             # Note that this section can also be postponed until TASK 4.2, since in this task, stand-alone RBMs do not contain labels in visible layer.
             
-            pass
+            # Compute total input to visible layer
+            support = self.bias_v + hidden_minibatch @ self.weight_vh.T
             
+            # Split into data part and label part
+            data_support = support[:, :-self.n_labels]
+            label_support = support[:, -self.n_labels:]
+            
+            # Data part: sigmoid activation + binary sampling
+            p_v_data = sigmoid(data_support)
+            v_data = sample_binary(p_v_data)
+            
+            # Label part: softmax activation + categorical sampling
+            p_v_label = softmax(label_support)
+            v_label = sample_categorical(p_v_label)
+            
+            # Concatenate back together
+            p_v_given_h_value = np.concatenate([p_v_data, p_v_label], axis=1)
+            v_sample = np.concatenate([v_data, v_label], axis=1)
+            
+            return p_v_given_h_value, v_sample
         else:
                         
             # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)             
+           
+           # Compute support (input to visible layer)
+            support = self.bias_v + hidden_minibatch @ self.weight_vh.T
 
-            pass
-        
-        return np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))
+            # P(V|H) using sigmoid activation
+            p_v_given_h_value = sigmoid(support)
 
+            # Sample from Bernoulli distribution
+            v_sample = sample_binary(p_v_given_h_value)
+
+            return p_v_given_h_value, v_sample
 
     
     """ rbm as a belief layer : the functions below do not have to be changed until running a deep belief net """

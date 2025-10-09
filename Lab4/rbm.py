@@ -258,8 +258,18 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_minibatch.shape[0]
 
         # [TODO TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below) 
+        support = self.bias_h + visible_minibatch @ self.weight_v_to_h
+
+        #P(H|V)
+        p_h_given_v_value = sigmoid(support)
         
-        return np.zeros((n_samples,self.ndim_hidden)), np.zeros((n_samples,self.ndim_hidden))
+        #activations h
+        #samples from a Bernoulli distribution
+        h_sample = sample_binary(p_h_given_v_value)
+
+        
+        return p_h_given_v_value, h_sample
+        
 
 
     def get_v_given_h_dir(self,hidden_minibatch):
@@ -293,15 +303,23 @@ class RestrictedBoltzmannMachine():
             # this case should never be executed : when the RBM is a part of a DBN and is at the top, it will have not have directed connections.
             # Appropriate code here is to raise an error (replace pass below)
             
-            pass
+            raise RuntimeError("get_v_given_h_dir called on top RBM; top stays undirected in a DBN.")
             
         else:
                         
             # [TODO TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)             
 
-            pass
+            # Compute support (input to visible layer)
+            support = self.bias_v + hidden_minibatch @ self.weight_h_to_v.T
+
+            # P(V|H) using sigmoid activation
+            p_v_given_h_value = sigmoid(support)
+
+            # Sample from Bernoulli distribution
+            v_sample = sample_binary(p_v_given_h_value)
+
+            return p_v_given_h_value, v_sample
             
-        return np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))        
         
     def update_generate_params(self,inps,trgs,preds):
         
@@ -320,7 +338,7 @@ class RestrictedBoltzmannMachine():
         self.delta_bias_v += 0
         
         self.weight_h_to_v += self.delta_weight_h_to_v
-        self.bias_v += self.delta_bias_v 
+        self.bias_v += self.delta_bias_v  
         
         return
     

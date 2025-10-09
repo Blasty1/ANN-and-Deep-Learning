@@ -61,7 +61,7 @@ class DeepBeliefNet():
           true_lbl: true labels shaped (number of samples, size of label layer). Used only for calculating accuracy, not driving the net
         """
         
-        n_samples = true_img.shape[0]
+        n_samples = true_img.shape[0] 
         
         vis = true_img # visible layer gets the image data
         
@@ -138,26 +138,42 @@ class DeepBeliefNet():
         except IOError :
 
             # [TODO TASK 4.2] use CD-1 to train all RBMs greedily
-        
+            
             print ("training vis--hid")
             """ 
             CD-1 training for vis--hid 
-            """            
+            """ 
+            self.rbm_stack['vis--hid'].cd1(vis_trainset)
+
+            p_h_given_v_vis, h_sample_vis = self.rbm_stack['vis--hid'].get_h_given_v_dir(vis_trainset)
+            hid_trainset = p_h_given_v_vis
+
             self.savetofile_rbm(loc="trained_rbm",name="vis--hid")
+
 
             print ("training hid--pen")
             """ 
             CD-1 training for hid--pen 
             """            
-            self.rbm_stack["vis--hid"].untwine_weights()            
-            self.savetofile_rbm(loc="trained_rbm",name="hid--pen")            
+            self.rbm_stack["vis--hid"].untwine_weights() 
+
+            self.rbm_stack["hid--pen"].cd1(hid_trainset)    
+
+            p_h_given_v_hid, h_sample_hid = self.rbm_stack["hid--pen"].get_h_given_v(hid_trainset)
+            pen_trainset = p_h_given_v_hid
+
+            self.savetofile_rbm(loc="trained_rbm",name="hid--pen") 
 
             print ("training pen+lbl--top")
             """ 
             CD-1 training for pen+lbl--top 
             """
             self.rbm_stack["hid--pen"].untwine_weights()
-            self.savetofile_rbm(loc="trained_rbm",name="pen+lbl--top")            
+
+            pen_plus_lbl = np.concatenate([pen_trainset, lbl_trainset], axis=1)
+            self.rbm_stack["hid--pen"].cd1(pen_plus_lbl)
+            
+            self.savetofile_rbm(loc="trained_rbm",name="pen+lbl--top")          
 
         return    
 

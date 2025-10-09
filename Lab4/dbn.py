@@ -55,31 +55,47 @@ class DeepBeliefNet():
     def recognize(self,true_img,true_lbl):
 
         """Recognize/Classify the data into label categories and calculate the accuracy
-
+    
         Args:
-          true_imgs: visible data shaped (number of samples, size of visible layer)
+          true_img: visible data shaped (number of samples, size of visible layer)
           true_lbl: true labels shaped (number of samples, size of label layer). Used only for calculating accuracy, not driving the net
         """
-        
-        n_samples = true_img.shape[0] 
-        
-        vis = true_img # visible layer gets the image data
-        
-        lbl = np.ones(true_lbl.shape)/10. # start the net by telling you know nothing about labels        
-        
-        # [TODO TASK 4.2] fix the image data in the visible layer and drive the network bottom to top. In the top RBM, run alternating Gibbs sampling \
+         # [TODO TASK 4.2] fix the image data in the visible layer and drive the network bottom to top. In the top RBM, run alternating Gibbs sampling \
         # and read out the labels (replace pass below and 'predicted_lbl' to your predicted labels).
         # NOTE : inferring entire train/test set may require too much compute memory (depends on your system). In that case, divide into mini-batches.
-        
-        for _ in range(self.n_gibbs_recog):
+        n_samples = true_img.shape[0] 
+        batch_size =self.batch_size
+        all_preds = []
+        correct = 0
 
-            pass
+        for i in range(0, n_samples, batch_size):
+            vis_batch = true_img[i:i+batch_size]
+            lbl_batch = true_lbl[i:i+batch_size]
+            lbl = np.ones(lbl_batch.shape) / float(self.sizes["lbl"])
 
-        predicted_lbl = np.zeros(true_lbl.shape)
-            
-        print ("accuracy = %.2f%%"%(100.*np.mean(np.argmax(predicted_lbl,axis=1)==np.argmax(true_lbl,axis=1))))
-        
-        return
+            p_hid, _ = self.rbm_stack["vis--hid"].get_h_given_v_dir(vis_batch)
+            p_pen, _ = self.rbm_stack["hid--pen"].get_h_given_v_dir(p_hid)
+            pen = p_pen
+
+            rbm_top = self.rbm_stack["pen+lbl--top"]
+            n_pen = self.sizes["pen"]
+            top_v = np.concatenate((pen, lbl), axis=1)
+
+            for _ in range(self.n_gibbs_recog):
+                p_h, top_h = rbm_top.get_h_given_v(top_v)
+                p_v, top_v_sample = rbm_top.get_v_given_h(top_h)
+                top_v = np.concatenate((pen, p_v[:, n_pen:]), axis=1)
+
+            # predicted_lbl = np.zeros(true_lbl.shape)
+            predicted_lbl = top_v[:, n_pen:] # shape (n_samples, n_labels)
+            all_preds.append(predicted_lbl)
+            correct += np.sum(np.argmax(predicted_lbl, axis=1) == np.argmax(lbl_batch, axis=1))
+
+        predicted_lbl_full = np.vstack(all_preds)
+        accuracy = 100.0 * correct / n_samples
+
+        print("accuracy = %.2f%%" % accuracy)
+        return predicted_lbl_full, accuracy
 
     def generate(self,true_lbl,name):
         
@@ -89,28 +105,44 @@ class DeepBeliefNet():
           true_lbl: true labels shaped (number of samples, size of label layer)
           name: string used for saving a video of generated visible activations
         """
-        
+        # [TODO TASK 4.2] fix the label in the label layer and run alternating Gibbs sampling in the top RBM. From the top RBM, drive the network \ 
+        # top to the bottom visible layer (replace 'vis' from random to your generated visible layer).
+       
         n_sample = true_lbl.shape[0]
-        
+        batch_size = self.batch_size
+        rbm_top = self.rbm_stack["pen+lbl--top"]
+        n_pen = self.sizes["pen"]
+        generated_images = []
         records = []        
         fig,ax = plt.subplots(1,1,figsize=(3,3))
         plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
         ax.set_xticks([]); ax.set_yticks([])
+        single_lbl_index = np.argmax(true_lbl[0])
 
-        lbl = true_lbl
+        for i in range(0, n_sample, batch_size):
+            lbl_batch = true_lbl[i:i+batch_size]
+            current_batch = lbl_batch.shape[0]
 
-        # [TODO TASK 4.2] fix the label in the label layer and run alternating Gibbs sampling in the top RBM. From the top RBM, drive the network \ 
-        # top to the bottom visible layer (replace 'vis' from random to your generated visible layer).
-            
-        for _ in range(self.n_gibbs_gener):
+            pen = np.random.rand(current_batch, n_pen)
+            top_v = np.concatenate((pen, lbl_batch), axis=1)
 
-            vis = np.random.rand(n_sample,self.sizes["vis"])
+            for _ in range(self.n_gibbs_gener):
+                p_h, top_h = rbm_top.get_h_given_v(top_v)
+                p_v, top_v_sample = rbm_top.get_v_given_h(top_h)
+                top_v = np.concatenate((p_v[:, :n_pen], lbl_batch), axis=1)
+
+                pen_current = top_v[:, :n_pen]
+
+                p_hid, hid = self.rbm_stack["hid--pen"].get_v_given_h_dir(pen_current)
+                p_vis, vis = self.rbm_stack["vis--hid"].get_v_given_h_dir(hid)
+                if i == 0: # record only the first batch
+                    vis_sample_0 = p_vis[0].reshape(self.image_size)
+                    records.append( [ ax.imshow(vis_sample_0, cmap="bwr", vmin=0, vmax=1, animated=True, interpolation=None) ] )
             
-            records.append( [ ax.imshow(vis.reshape(self.image_size), cmap="bwr", vmin=0, vmax=1, animated=True, interpolation=None) ] )
-            
-        anim = stitch_video(fig,records).save("%s.generate%d.mp4"%(name,np.argmax(true_lbl)))            
-            
-        return
+        anim = stitch_video(fig,records).save("%s.generate%d.mp4"%(name, single_lbl_index))            
+
+
+        return generated_images
 
     def train_greedylayerwise(self, vis_trainset, lbl_trainset, n_iterations):
 
@@ -137,7 +169,7 @@ class DeepBeliefNet():
 
         except IOError :
 
-            # [TODO TASK 4.2] use CD-1 to train all RBMs greedily
+            # // [TODO TASK 4.2] use CD-1 to train all RBMs greedily
             
             print ("training vis--hid")
             """ 

@@ -128,7 +128,7 @@ def plot_reconstruction_error(rbm, save_name="recon_error"):
     """Plot reconstruction error curve from training."""
     reconstruction_error = rbm.get_riconstruction_error()
 
-    if len(rbm.reconstruction_error) == 0:
+    if len(reconstruction_error) == 0:
         print("No reconstruction errors to plot!")
         return
    

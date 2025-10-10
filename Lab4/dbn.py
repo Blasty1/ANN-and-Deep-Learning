@@ -177,7 +177,7 @@ class DeepBeliefNet():
             """ 
             self.rbm_stack['vis--hid'].cd1_batch(vis_trainset)
 
-            p_h_given_v_vis, h_sample_vis = self.rbm_stack['vis--hid'].get_h_given_v_dir(vis_trainset)
+            p_h_given_v_vis, h_sample_vis = self.rbm_stack['vis--hid'].get_h_given_v(vis_trainset)
             hid_trainset = p_h_given_v_vis
 
             self.savetofile_rbm(loc="trained_rbm",name="vis--hid")
@@ -203,7 +203,7 @@ class DeepBeliefNet():
             self.rbm_stack["hid--pen"].untwine_weights()
 
             pen_plus_lbl = np.concatenate([pen_trainset, lbl_trainset], axis=1)
-            self.rbm_stack["hid--pen"].cd1_batch(pen_plus_lbl)
+            self.rbm_stack["pen+lbl--top"].cd1(pen_plus_lbl)
             
             self.savetofile_rbm(loc="trained_rbm",name="pen+lbl--top")          
 

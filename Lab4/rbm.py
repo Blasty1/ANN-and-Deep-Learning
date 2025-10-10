@@ -1,4 +1,5 @@
 from util import *
+from tqdm import tqdm
 
 class RestrictedBoltzmannMachine():
     '''
@@ -51,11 +52,11 @@ class RestrictedBoltzmannMachine():
         
         self.weight_h_to_v = None
 
-        self.learning_rate = 0.01
+        self.learning_rate = 0.001
         
         self.momentum = 0.7
 
-        self.print_period = 5000
+        self.print_period = 5#000
         
         self.rf = { # receptive-fields. Only applicable when visible layer is input data
             "period" : 5000, # iteration period to visualize
@@ -102,10 +103,62 @@ class RestrictedBoltzmannMachine():
             
             if it % self.print_period == 0 :
 
-                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - visible_trainset)))
+                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - v1)))
+                with open('dbm_log.txt', 'a') as f:
+                    f.write(f"{it} {np.linalg.norm(visible_trainset - v1)}\n")
         
         return
     
+    def cd1_batch(self,visible_trainset, n_iterations=10000):
+        
+        """Contrastive Divergence with k=1 full alternating Gibbs sampling
+            with mini-batch 
+        Args:
+          visible_trainset: training data for this rbm, shape is (size of training set, size of visible layer)
+          n_iterations: number of iterations of learning (each iteration learns a mini-batch)
+        """
+
+        print ("learning CD1")
+        
+        n_samples = visible_trainset.shape[0]
+        batch_size = self.batch_size
+        n_batches = n_samples // batch_size
+
+
+        for it in range(n_iterations):
+            indices = np.random.permutation(n_samples)
+            shuffled_data = visible_trainset[indices]
+            for batch_idx in tqdm(range(n_batches)):
+                batch_start = batch_idx * batch_size
+                batch_end = batch_start + batch_size
+                v_batch = shuffled_data[batch_start:batch_end]
+
+	    # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
+            # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
+            # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
+                p_h_given_v , h0 = self.get_h_given_v(v_batch) # v_0 -> h_0
+                p_v_given_h , v1 = self.get_v_given_h(h0) # h_0 -> v_1
+                       
+                p_h_given_v_recon, h1 = self.get_h_given_v(v1) # v_1 -> h_1
+
+            # [TODO TASK 4.1] update the parameters using function 'update_params'
+                self.update_params(v_batch,h0,v1,h1)
+            
+            # visualize once in a while when visible layer is input images
+            
+            if it % self.rf["period"] == 0 and self.is_bottom:
+                
+                viz_rf(weights=self.weight_vh[:,self.rf["ids"]].reshape((self.image_size[0],self.image_size[1],-1)), it=it, grid=self.rf["grid"])
+
+            # print progress
+            
+            if it % self.print_period == 0 :
+
+                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(v_batch - v1)))
+                with open('dbm_log.txt', 'a') as f:
+                    f.write(f"{it} {np.linalg.norm(v_batch - v1)}\n")
+        
+        return
 
     def update_params(self,v_0,h_0,v_k,h_k):
 
@@ -124,10 +177,13 @@ class RestrictedBoltzmannMachine():
         # [TODO TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
         batch_size = v_0.shape[0]
         
-        self.delta_bias_v += np.sum(v_0 - v_k, axis=0) / batch_size
-        self.delta_weight_vh += (v_0.T @ h_0 - v_k.T @ h_k)/batch_size
-        self.delta_bias_h += np.sum(h_0 - h_k, axis=0) / batch_size
-        
+        #! self.delta_bias_v += np.sum(v_0 - v_k, axis=0) / batch_size
+        #! self.delta_weight_vh += (v_0.T @ h_0 - v_k.T @ h_k)/batch_size
+        #! self.delta_bias_h += np.sum(h_0 - h_k, axis=0) / batch_size
+        self.delta_bias_v = np.sum(v_0 - v_k, axis=0) / batch_size
+        self.delta_weight_vh = (v_0.T @ h_0 - v_k.T @ h_k)/batch_size
+        self.delta_bias_h = np.sum(h_0 - h_k, axis=0) / batch_size
+
         self.bias_v += self.learning_rate * self.delta_bias_v 
         self.weight_vh += self.learning_rate *  self.delta_weight_vh
         self.bias_h += self.learning_rate *  self.delta_bias_h
@@ -310,7 +366,7 @@ class RestrictedBoltzmannMachine():
             # // [TODO TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)             
 
             # Compute support (input to visible layer)
-            support = self.bias_v + hidden_minibatch @ self.weight_h_to_v.T
+            support = self.bias_v + hidden_minibatch @ self.weight_h_to_v #! i delete it: .T
 
             # P(V|H) using sigmoid activation
             p_v_given_h_value = sigmoid(support)

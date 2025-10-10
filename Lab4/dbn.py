@@ -139,8 +139,8 @@ class DeepBeliefNet():
                     vis_sample_0 = p_vis[0].reshape(self.image_size)
                     records.append( [ ax.imshow(vis_sample_0, cmap="bwr", vmin=0, vmax=1, animated=True, interpolation=None) ] )
             
-        anim = stitch_video(fig,records).save("%s.generate%d.mp4"%(name, single_lbl_index))            
-
+        anim = stitch_video(fig, records)
+        anim.save("%s.generate%d.gif" % (name, single_lbl_index), writer='ffmpeg')
 
         return generated_images
 
@@ -159,7 +159,7 @@ class DeepBeliefNet():
 
         try :
 
-            self.loadfromfile_rbm(loc="trained_rbm",name="vis--hid")
+            self.loadfromfile_rbm(loc="trained_rbm",name="vis--hid_wrong")
             self.rbm_stack["vis--hid"].untwine_weights()            
             
             self.loadfromfile_rbm(loc="trained_rbm",name="hid--pen")
@@ -175,7 +175,7 @@ class DeepBeliefNet():
             """ 
             CD-1 training for vis--hid 
             """ 
-            self.rbm_stack['vis--hid'].cd1(vis_trainset)
+            self.rbm_stack['vis--hid'].cd1_batch(vis_trainset)
 
             p_h_given_v_vis, h_sample_vis = self.rbm_stack['vis--hid'].get_h_given_v_dir(vis_trainset)
             hid_trainset = p_h_given_v_vis
@@ -189,7 +189,7 @@ class DeepBeliefNet():
             """            
             self.rbm_stack["vis--hid"].untwine_weights() 
 
-            self.rbm_stack["hid--pen"].cd1(hid_trainset)    
+            self.rbm_stack["hid--pen"].cd1_batch(hid_trainset)    
 
             p_h_given_v_hid, h_sample_hid = self.rbm_stack["hid--pen"].get_h_given_v(hid_trainset)
             pen_trainset = p_h_given_v_hid
@@ -203,7 +203,7 @@ class DeepBeliefNet():
             self.rbm_stack["hid--pen"].untwine_weights()
 
             pen_plus_lbl = np.concatenate([pen_trainset, lbl_trainset], axis=1)
-            self.rbm_stack["hid--pen"].cd1(pen_plus_lbl)
+            self.rbm_stack["hid--pen"].cd1_batch(pen_plus_lbl)
             
             self.savetofile_rbm(loc="trained_rbm",name="pen+lbl--top")          
 

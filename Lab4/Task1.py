@@ -21,5 +21,19 @@ if __name__ == "__main__":
     rbm.cd1(train_imgs,n_iterations=n_iterations)
     
     plot_reconstruction_error(rbm)
+    
+    # several_configurations = [200,250,300,350,400,450,500]
+    # for configuration in several_configurations:
+    #     ndim_hidden = configuration
+
+    #     rbm = RestrictedBoltzmannMachine(ndim_visible=ndim_visible,is_bottom=True, ndim_hidden=ndim_hidden, batch_size=batch_size,image_size=image_size)
+        
+        
+    #     n_samples = train_imgs.shape[0]  # 60,000
+    #     n_epochs = 20 
+    #     iterations_per_epoch = n_samples // batch_size
+    #     n_iterations = n_epochs * iterations_per_epoch  
+
+    #     rbm.cd1(train_imgs,n_iterations=n_iterations)
 
     

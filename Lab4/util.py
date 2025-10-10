@@ -134,7 +134,7 @@ def plot_reconstruction_error(rbm, save_name="recon_error"):
    
     x = []
     y = []
-    for (n_iteration,value) in rbm.g:
+    for (n_iteration,value) in reconstruction_error:
         x.append(n_iteration)
         y.append(value)
     

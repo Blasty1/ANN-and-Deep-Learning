@@ -122,3 +122,30 @@ def stitch_video(fig,imgs):
     import matplotlib.animation as animation
     
     return animation.ArtistAnimation(fig, imgs, interval=100, blit=True, repeat=False)    
+
+
+def plot_reconstruction_error(rbm, save_name="recon_error"):
+    """Plot reconstruction error curve from training."""
+    reconstruction_error = rbm.get_riconstruction_error()
+
+    if len(rbm.reconstruction_error) == 0:
+        print("No reconstruction errors to plot!")
+        return
+   
+    x = []
+    y = []
+    for (n_iteration,value) in rbm.g:
+        x.append(n_iteration)
+        y.append(value)
+    
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, y, 'b-', linewidth=2, marker='o', markersize=3)
+    plt.xlabel('Iteration', fontsize=14)
+    plt.ylabel('Mean Squared Reconstruction Error', fontsize=14)
+    plt.title(f'Reconstruction Error During Training ({rbm.ndim_hidden} hidden units)', fontsize=22)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(f'{save_name}_{rbm.ndim_hidden}units.png', dpi=150)
+    plt.close()
+    print(f"Saved: {save_name}_{rbm.ndim_hidden}units.png")

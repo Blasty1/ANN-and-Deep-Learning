@@ -57,6 +57,10 @@ class RestrictedBoltzmannMachine():
 
         self.print_period = 5000
         
+        self.take_reconstruction_error_period = 100
+        
+        self.recon_errors = []
+        
         self.rf = { # receptive-fields. Only applicable when visible layer is input data
             "period" : 5000, # iteration period to visualize
             "grid" : [5,5], # size of the grid
@@ -80,29 +84,36 @@ class RestrictedBoltzmannMachine():
         n_samples = visible_trainset.shape[0]
 
         for it in range(n_iterations):
+            batch_indices = np.random.choice(n_samples, self.batch_size, replace=False)
+            visible_batch = visible_trainset[batch_indices]
 
 	    # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
             # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
-            p_h_given_v , h0 = self.get_h_given_v(visible_trainset) # v_0 -> h_0
+            p_h_given_v , h0 = self.get_h_given_v(visible_batch) # v_0 -> h_0
             p_v_given_h , v1 = self.get_v_given_h(h0) # h_0 -> v_1
                        
             p_h_given_v_recon, h1 = self.get_h_given_v(v1) # v_1 -> h_1
 
             # [TODO TASK 4.1] update the parameters using function 'update_params'
-            self.update_params(visible_trainset,h0,v1,h1)
+            self.update_params(visible_batch,h0,v1,h1)
             
             # visualize once in a while when visible layer is input images
             
             if it % self.rf["period"] == 0 and self.is_bottom:
-                
+
                 viz_rf(weights=self.weight_vh[:,self.rf["ids"]].reshape((self.image_size[0],self.image_size[1],-1)), it=it, grid=self.rf["grid"])
 
-            # print progress
+            # Every 100 iterations
+            if it % self.take_reconstruction_error_period == 0: 
+                reconstruction_loss = np.mean((visible_batch - v1) ** 2)
+                self.recon_errors.append((it,reconstruction_loss))
+        
             
+            # print progress
             if it % self.print_period == 0 :
-
-                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - visible_trainset)))
+                reconstruction_loss = np.mean((visible_batch - v1)**2)
+                print ("iteration=%7d recon_loss=%4.4f"%(it,reconstruction_loss))
         
         return
     
@@ -232,7 +243,8 @@ class RestrictedBoltzmannMachine():
     
     """ rbm as a belief layer : the functions below do not have to be changed until running a deep belief net """
 
-    
+    def get_riconstruction_error(self):
+        return self.recon_errors
 
     def untwine_weights(self):
         

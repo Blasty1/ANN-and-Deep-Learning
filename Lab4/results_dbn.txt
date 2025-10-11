@@ -1,0 +1,2 @@
+DBN train accuracy : 9433.50 % 
+DBN test accuracy  : 9430.00 % 

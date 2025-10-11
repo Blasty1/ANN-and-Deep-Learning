@@ -15,17 +15,18 @@ if __name__ == "__main__":
     dbn = DeepBeliefNet(sizes={"vis":image_size[0]*image_size[1], "hid":500, "pen":500, "top":2000, "lbl":10},
                         image_size=image_size,
                         n_labels=10,
-                        batch_size=20
+                        batch_size=64
     )
     
     ''' greedy layer-wise training '''
 
-    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=10000)
+    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=300)
 
     predicted_lbl_train, accuracy_train = dbn.recognize(train_imgs, train_lbls)
     
     predicted_lbl_test, accuracy_test = dbn.recognize(test_imgs, test_lbls)
-
+    print(test_lbls[:10])
+    print(predicted_lbl_test[:10])
     with open("results_dbn.txt","w") as f:
         f.write("DBN train accuracy : %.2f %% \n" % (accuracy_train*100))
         f.write("DBN test accuracy  : %.2f %% \n" % (accuracy_test*100))

@@ -57,9 +57,9 @@ class RestrictedBoltzmannMachine():
         
         self.momentum = 0.7
 
-        self.print_period = 5000
+        self.print_period = 5#000
         
-        self.take_reconstruction_error_period = 100
+        self.take_reconstruction_error_period = 50
         
         self.recon_errors = []
         
@@ -160,18 +160,18 @@ class RestrictedBoltzmannMachine():
 
                 viz_rf(weights=self.weight_vh[:,self.rf["ids"]].reshape((self.image_size[0],self.image_size[1],-1)), it=it, grid=self.rf["grid"])
 
-            # Every 100 iterations
-            # if it % self.take_reconstruction_error_period == 0: 
-            #     reconstruction_loss = np.mean((visible_batch - v1) ** 2)
-            #     self.recon_errors.append((it,reconstruction_loss))
+            # Every 50 iterations
+            if it % self.take_reconstruction_error_period == 0: 
+                reconstruction_loss = np.mean((v_batch - v1) ** 2)
+                self.recon_errors.append((it,reconstruction_loss))
         
             
             # print progress
-            if it % self.print_period == 0 :
+            # if it % self.print_period == 0 :
 
-                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(v_batch - v1)))
-                with open('dbm_log.txt', 'a') as f:
-                    f.write(f"{it} {np.linalg.norm(v_batch - v1)}\n")
+            print ("iteration=%7d recon_loss=%4.4f dist_loss=%4.4f"%(it, np.mean((v_batch - v1)**2), np.linalg.norm(v_batch - v1)))
+            with open('dbm_log.txt', 'a') as f:
+                f.write(f"{it}, {np.mean((v_batch - v1)**2)}, {np.linalg.norm(v_batch - v1)}\n")
         
         return
 
